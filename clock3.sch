@@ -308,7 +308,7 @@ F 3 "~" H 9900 4250 50  0001 C CNN
 $EndComp
 Text Label 10050 4250 0    50   ~ 0
 BOOT0
-Text Label 3650 2450 2    50   ~ 0
+Text Label 4950 3050 0    50   ~ 0
 BOOT0
 Wire Wire Line
 	9650 4250 9750 4250
@@ -391,7 +391,7 @@ F 3 "" H 9250 5000 50  0001 C CNN
 	1    9250 5000
 	1    0    0    -1  
 $EndComp
-Text Label 4950 4150 0    50   ~ 0
+Text Label 3650 4550 2    50   ~ 0
 BOOT1
 Text Label 3650 2250 2    50   ~ 0
 ~RESET
@@ -400,33 +400,33 @@ Text Label 8850 4550 2    50   ~ 0
 $Comp
 L Device:C C12
 U 1 1 5B4253CA
-P 5600 4850
-F 0 "C12" H 5750 4850 50  0000 C CNN
-F 1 "100nF" H 5750 4750 50  0000 C CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 5638 4700 50  0001 C CNN
-F 3 "~" H 5600 4850 50  0001 C CNN
-	1    5600 4850
+P 5800 4500
+F 0 "C12" H 5950 4500 50  0000 C CNN
+F 1 "100nF" H 5950 4400 50  0000 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 5838 4350 50  0001 C CNN
+F 3 "~" H 5800 4500 50  0001 C CNN
+	1    5800 4500
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	5800 5050 5600 5050
+	6000 4700 5800 4700
 Wire Wire Line
-	5600 5050 5600 5000
+	5800 4700 5800 4650
 Wire Wire Line
-	5600 4700 5600 4650
+	5800 4350 5800 4300
 $Comp
 L power:GND #PWR09
 U 1 1 5B4253D5
-P 5800 5150
-F 0 "#PWR09" H 5800 4900 50  0001 C CNN
-F 1 "GND" H 5800 5000 50  0000 C CNN
-F 2 "" H 5800 5150 50  0001 C CNN
-F 3 "" H 5800 5150 50  0001 C CNN
-	1    5800 5150
+P 6000 4800
+F 0 "#PWR09" H 6000 4550 50  0001 C CNN
+F 1 "GND" H 6000 4650 50  0000 C CNN
+F 2 "" H 6000 4800 50  0001 C CNN
+F 3 "" H 6000 4800 50  0001 C CNN
+	1    6000 4800
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	5800 5150 5800 5050
+	6000 4800 6000 4700
 Text Label 10450 6050 0    50   ~ 0
 I2C1_SCL
 Text Label 10450 5950 0    50   ~ 0
@@ -576,84 +576,75 @@ Wire Wire Line
 	8700 5900 8800 5900
 Connection ~ 8800 5900
 Wire Wire Line
-	5600 4650 5800 4650
+	5800 4300 6000 4300
 $Comp
 L Device:C C13
 U 1 1 5B48B647
-P 6350 4850
-F 0 "C13" H 6500 4850 50  0000 C CNN
-F 1 "100nF" H 6500 4750 50  0000 C CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 6388 4700 50  0001 C CNN
-F 3 "~" H 6350 4850 50  0001 C CNN
-	1    6350 4850
+P 6550 4500
+F 0 "C13" H 6700 4500 50  0000 C CNN
+F 1 "100nF" H 6700 4400 50  0000 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6588 4350 50  0001 C CNN
+F 3 "~" H 6550 4500 50  0001 C CNN
+	1    6550 4500
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	6550 5050 6350 5050
+	6750 4700 6550 4700
 Wire Wire Line
-	6350 5050 6350 5000
+	6550 4700 6550 4650
 Wire Wire Line
-	6350 4700 6350 4650
+	6550 4350 6550 4300
 $Comp
 L power:GND #PWR011
 U 1 1 5B48B650
-P 6550 5150
-F 0 "#PWR011" H 6550 4900 50  0001 C CNN
-F 1 "GND" H 6550 5000 50  0000 C CNN
-F 2 "" H 6550 5150 50  0001 C CNN
-F 3 "" H 6550 5150 50  0001 C CNN
-	1    6550 5150
+P 6750 4800
+F 0 "#PWR011" H 6750 4550 50  0001 C CNN
+F 1 "GND" H 6750 4650 50  0000 C CNN
+F 2 "" H 6750 4800 50  0001 C CNN
+F 3 "" H 6750 4800 50  0001 C CNN
+	1    6750 4800
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	6550 5150 6550 5050
+	6750 4800 6750 4700
 Wire Wire Line
-	6350 4650 6550 4650
+	6550 4300 6750 4300
 $Comp
 L Device:C C14
 U 1 1 5B48D05C
-P 7100 4850
-F 0 "C14" H 7250 4850 50  0000 C CNN
-F 1 "100nF" H 7250 4750 50  0000 C CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 7138 4700 50  0001 C CNN
-F 3 "~" H 7100 4850 50  0001 C CNN
-	1    7100 4850
+P 7300 4500
+F 0 "C14" H 7450 4500 50  0000 C CNN
+F 1 "100nF" H 7450 4400 50  0000 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 7338 4350 50  0001 C CNN
+F 3 "~" H 7300 4500 50  0001 C CNN
+	1    7300 4500
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	7300 5050 7100 5050
+	7500 4700 7300 4700
 Wire Wire Line
-	7100 5050 7100 5000
+	7300 4700 7300 4650
 Wire Wire Line
-	7100 4700 7100 4650
+	7300 4350 7300 4300
 $Comp
 L power:GND #PWR012
 U 1 1 5B48D065
-P 7300 5150
-F 0 "#PWR012" H 7300 4900 50  0001 C CNN
-F 1 "GND" H 7300 5000 50  0000 C CNN
-F 2 "" H 7300 5150 50  0001 C CNN
-F 3 "" H 7300 5150 50  0001 C CNN
-	1    7300 5150
+P 7500 4800
+F 0 "#PWR012" H 7500 4550 50  0001 C CNN
+F 1 "GND" H 7500 4650 50  0000 C CNN
+F 2 "" H 7500 4800 50  0001 C CNN
+F 3 "" H 7500 4800 50  0001 C CNN
+	1    7500 4800
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	7300 5150 7300 5050
+	7500 4800 7500 4700
 Wire Wire Line
-	7100 4650 7300 4650
+	7300 4300 7500 4300
+Connection ~ 6550 4300
 Wire Wire Line
-	4950 4650 5600 4650
-Connection ~ 5600 4650
-Wire Wire Line
-	4950 4550 6350 4550
-Wire Wire Line
-	6350 4550 6350 4650
-Connection ~ 6350 4650
-Wire Wire Line
-	4950 4450 7100 4450
-Wire Wire Line
-	7100 4450 7100 4650
-Connection ~ 7100 4650
+	7300 4100 7300 4300
+Connection ~ 7300 4300
 $Comp
 L Device:Crystal Y1
 U 1 1 5B4BA15B
@@ -743,24 +734,11 @@ Wire Wire Line
 	4150 5650 4250 5650
 NoConn ~ 3650 2650
 NoConn ~ 3650 3750
-NoConn ~ 3650 4450
-NoConn ~ 3650 4550
-NoConn ~ 3650 4650
-NoConn ~ 3650 4750
-NoConn ~ 3650 4850
 NoConn ~ 3650 4950
 NoConn ~ 3650 5050
 NoConn ~ 3650 5150
 NoConn ~ 3650 5250
-NoConn ~ 4950 2650
-NoConn ~ 4950 2750
-NoConn ~ 4950 2850
 NoConn ~ 4950 2950
-NoConn ~ 4950 3050
-NoConn ~ 4950 3950
-NoConn ~ 4950 4050
-NoConn ~ 4950 4250
-NoConn ~ 4950 4350
 $Comp
 L power:VCC #PWR029
 U 1 1 5B54E6BC
@@ -821,55 +799,47 @@ NoConn ~ 10050 6350
 $Comp
 L Device:LED D1
 U 1 1 5B54E19F
-P 5400 2250
-F 0 "D1" H 5150 2300 50  0000 C CNN
-F 1 "LED" H 5391 2375 50  0000 C CNN
-F 2 "LED_SMD:LED_1206_3216Metric" H 5400 2250 50  0001 C CNN
-F 3 "~" H 5400 2250 50  0001 C CNN
-	1    5400 2250
+P 6850 6000
+F 0 "D1" H 6600 6050 50  0000 C CNN
+F 1 "LED" H 6841 6125 50  0000 C CNN
+F 2 "LED_SMD:LED_1206_3216Metric" H 6850 6000 50  0001 C CNN
+F 3 "~" H 6850 6000 50  0001 C CNN
+	1    6850 6000
 	1    0    0    -1  
 $EndComp
 $Comp
 L Device:LED D2
 U 1 1 5B552F50
-P 5400 2350
-F 0 "D2" H 5150 2400 50  0000 C CNN
-F 1 "LED" H 5391 2475 50  0000 C CNN
-F 2 "LED_SMD:LED_1206_3216Metric" H 5400 2350 50  0001 C CNN
-F 3 "~" H 5400 2350 50  0001 C CNN
-	1    5400 2350
+P 6850 6100
+F 0 "D2" H 6600 6150 50  0000 C CNN
+F 1 "LED" H 6841 6225 50  0000 C CNN
+F 2 "LED_SMD:LED_1206_3216Metric" H 6850 6100 50  0001 C CNN
+F 3 "~" H 6850 6100 50  0001 C CNN
+	1    6850 6100
 	1    0    0    -1  
 $EndComp
 $Comp
 L Device:LED D3
 U 1 1 5B552FB0
-P 5400 2450
-F 0 "D3" H 5150 2500 50  0000 C CNN
-F 1 "LED" H 5391 2575 50  0000 C CNN
-F 2 "LED_SMD:LED_1206_3216Metric" H 5400 2450 50  0001 C CNN
-F 3 "~" H 5400 2450 50  0001 C CNN
-	1    5400 2450
+P 6850 6200
+F 0 "D3" H 6600 6250 50  0000 C CNN
+F 1 "LED" H 6841 6325 50  0000 C CNN
+F 2 "LED_SMD:LED_1206_3216Metric" H 6850 6200 50  0001 C CNN
+F 3 "~" H 6850 6200 50  0001 C CNN
+	1    6850 6200
 	1    0    0    -1  
 $EndComp
 $Comp
 L Device:LED D4
 U 1 1 5B55300A
-P 5400 2550
-F 0 "D4" H 5150 2600 50  0000 C CNN
-F 1 "LED" H 5391 2675 50  0000 C CNN
-F 2 "LED_SMD:LED_1206_3216Metric" H 5400 2550 50  0001 C CNN
-F 3 "~" H 5400 2550 50  0001 C CNN
-	1    5400 2550
+P 6850 6300
+F 0 "D4" H 6600 6350 50  0000 C CNN
+F 1 "LED" H 6841 6425 50  0000 C CNN
+F 2 "LED_SMD:LED_1206_3216Metric" H 6850 6300 50  0001 C CNN
+F 3 "~" H 6850 6300 50  0001 C CNN
+	1    6850 6300
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	5250 2250 4950 2250
-Wire Wire Line
-	4950 2350 5250 2350
-Wire Wire Line
-	5250 2450 4950 2450
-Wire Wire Line
-	5250 2550 4950 2550
 Text Label 4950 5150 0    50   ~ 0
 SPI2_NSS
 Text Label 4950 5250 0    50   ~ 0
@@ -902,36 +872,30 @@ SPI2_NSS
 $Comp
 L power:VDD #PWR021
 U 1 1 5B565FC8
-P 9500 950
-F 0 "#PWR021" H 9500 800 50  0001 C CNN
-F 1 "VDD" H 9517 1123 50  0000 C CNN
-F 2 "" H 9500 950 50  0001 C CNN
-F 3 "" H 9500 950 50  0001 C CNN
-	1    9500 950 
+P 9500 850
+F 0 "#PWR021" H 9500 700 50  0001 C CNN
+F 1 "VDD" H 9517 1023 50  0000 C CNN
+F 2 "" H 9500 850 50  0001 C CNN
+F 3 "" H 9500 850 50  0001 C CNN
+	1    9500 850 
 	1    0    0    -1  
 $EndComp
 $Comp
 L Device:C C16
 U 1 1 5B5689DE
-P 9750 1150
-F 0 "C16" H 9865 1196 50  0000 L CNN
-F 1 "1uF" H 9865 1105 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 9788 1000 50  0001 C CNN
-F 3 "~" H 9750 1150 50  0001 C CNN
-	1    9750 1150
+P 9750 1050
+F 0 "C16" H 9865 1096 50  0000 L CNN
+F 1 "1uF" H 9865 1005 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 9788 900 50  0001 C CNN
+F 3 "~" H 9750 1050 50  0001 C CNN
+	1    9750 1050
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9500 1350 9750 1350
+	9500 850  9500 900 
 Wire Wire Line
-	9750 1350 9750 1300
-Wire Wire Line
-	9500 950  9500 1000
-Wire Wire Line
-	9750 1000 9500 1000
-Connection ~ 9500 1000
-Wire Wire Line
-	9500 1000 9500 1350
+	9750 900  9500 900 
+Connection ~ 9500 900 
 Text Label 4950 4950 0    50   ~ 0
 USART3_TX
 Text Label 4950 5050 0    50   ~ 0
@@ -944,36 +908,35 @@ Text Label 10100 1550 0    50   ~ 0
 ESP_GPIO0
 Text Label 10100 1750 0    50   ~ 0
 ESP_GPIO2
-Text Label 3650 3950 2    50   ~ 0
+Text Label 4950 3950 0    50   ~ 0
 ESP_GPIO0
-Text Label 3650 4050 2    50   ~ 0
+Text Label 4950 4050 0    50   ~ 0
 ESP_GPIO2
 Text Label 8900 1750 2    50   ~ 0
 ESP_ENABLE
 Text Label 8900 1550 2    50   ~ 0
 ESP_NRST
-Text Label 3650 4150 2    50   ~ 0
+Text Label 4950 2750 0    50   ~ 0
 ESP_ENABLE
-Text Label 3650 4250 2    50   ~ 0
+Text Label 4950 2650 0    50   ~ 0
 ESP_NRST
 $Comp
 L RF_Module:ESP-07 U3
 U 1 1 5B572667
 P 9500 2150
-F 0 "U3" H 9500 3128 50  0000 C CNN
-F 1 "ESP-07" H 9500 3037 50  0000 C CNN
+F 0 "U3" H 9050 2900 50  0000 C CNN
+F 1 "ESP-07" H 9850 2900 50  0000 C CNN
 F 2 "RF_Module:ESP-07" H 9500 2150 50  0001 C CNN
 F 3 "http://wiki.ai-thinker.com/_media/esp8266/esp8266_series_modules_user_manual_v1.1.pdf" H 9150 2250 50  0001 C CNN
 	1    9500 2150
 	1    0    0    -1  
 $EndComp
-Connection ~ 9500 1350
 NoConn ~ 8900 1950
 NoConn ~ 10100 1950
 NoConn ~ 10100 2050
 Text Label 10100 2550 0    50   ~ 0
 ESP_WAKE
-Text Label 3650 4350 2    50   ~ 0
+Text Label 4950 2850 0    50   ~ 0
 ESP_WAKE
 $Comp
 L dk_PMIC-Voltage-Regulators-Linear:AP2114H-3_3TRG1 U1
@@ -1258,14 +1221,8 @@ Wire Notes Line
 	10400 3500 10400 5600
 Text Notes 7800 5700 0    50   ~ 10
 USB
-Wire Notes Line
-	7750 5600 11250 5600
-Wire Notes Line
-	7750 3500 11250 3500
 Text Notes 7800 3600 0    50   ~ 10
 BUTTONS AND SWITCHES
-Wire Notes Line
-	7750 450  7750 6550
 Text Notes 7800 600  0    50   ~ 10
 WIFI
 Wire Notes Line
@@ -1275,66 +1232,66 @@ Wire Notes Line
 $Comp
 L dk_Tactile-Switches:B3U-1000P S1
 U 1 1 5B65D55A
-P 5800 4850
-F 0 "S1" V 5747 4988 60  0000 L CNN
-F 1 "B3U-1000P" V 5500 4700 60  0000 L CNN
-F 2 "digikey-footprints:Switch_Tactile_SMD_B3U-1000P" H 6000 5050 60  0001 L CNN
-F 3 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 6000 5150 60  0001 L CNN
-F 4 "SW1020CT-ND" H 6000 5250 60  0001 L CNN "Digi-Key_PN"
-F 5 "B3U-1000P" H 6000 5350 60  0001 L CNN "MPN"
-F 6 "Switches" H 6000 5450 60  0001 L CNN "Category"
-F 7 "Tactile Switches" H 6000 5550 60  0001 L CNN "Family"
-F 8 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 6000 5650 60  0001 L CNN "DK_Datasheet_Link"
-F 9 "/product-detail/en/omron-electronics-inc-emc-div/B3U-1000P/SW1020CT-ND/1534357" H 6000 5750 60  0001 L CNN "DK_Detail_Page"
-F 10 "SWITCH TACTILE SPST-NO 0.05A 12V" H 6000 5850 60  0001 L CNN "Description"
-F 11 "Omron Electronics Inc-EMC Div" H 6000 5950 60  0001 L CNN "Manufacturer"
-F 12 "Active" H 6000 6050 60  0001 L CNN "Status"
-	1    5800 4850
+P 6000 4500
+F 0 "S1" V 5947 4638 60  0000 L CNN
+F 1 "B3U-1000P" V 5700 4350 60  0000 L CNN
+F 2 "digikey-footprints:Switch_Tactile_SMD_B3U-1000P" H 6200 4700 60  0001 L CNN
+F 3 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 6200 4800 60  0001 L CNN
+F 4 "SW1020CT-ND" H 6200 4900 60  0001 L CNN "Digi-Key_PN"
+F 5 "B3U-1000P" H 6200 5000 60  0001 L CNN "MPN"
+F 6 "Switches" H 6200 5100 60  0001 L CNN "Category"
+F 7 "Tactile Switches" H 6200 5200 60  0001 L CNN "Family"
+F 8 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 6200 5300 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/omron-electronics-inc-emc-div/B3U-1000P/SW1020CT-ND/1534357" H 6200 5400 60  0001 L CNN "DK_Detail_Page"
+F 10 "SWITCH TACTILE SPST-NO 0.05A 12V" H 6200 5500 60  0001 L CNN "Description"
+F 11 "Omron Electronics Inc-EMC Div" H 6200 5600 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 6200 5700 60  0001 L CNN "Status"
+	1    6000 4500
 	0    1    1    0   
 $EndComp
-Connection ~ 5800 5050
+Connection ~ 6000 4700
 $Comp
 L dk_Tactile-Switches:B3U-1000P S2
 U 1 1 5B65D785
-P 6550 4850
-F 0 "S2" V 6497 4988 60  0000 L CNN
-F 1 "B3U-1000P" V 6250 4700 60  0000 L CNN
-F 2 "digikey-footprints:Switch_Tactile_SMD_B3U-1000P" H 6750 5050 60  0001 L CNN
-F 3 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 6750 5150 60  0001 L CNN
-F 4 "SW1020CT-ND" H 6750 5250 60  0001 L CNN "Digi-Key_PN"
-F 5 "B3U-1000P" H 6750 5350 60  0001 L CNN "MPN"
-F 6 "Switches" H 6750 5450 60  0001 L CNN "Category"
-F 7 "Tactile Switches" H 6750 5550 60  0001 L CNN "Family"
-F 8 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 6750 5650 60  0001 L CNN "DK_Datasheet_Link"
-F 9 "/product-detail/en/omron-electronics-inc-emc-div/B3U-1000P/SW1020CT-ND/1534357" H 6750 5750 60  0001 L CNN "DK_Detail_Page"
-F 10 "SWITCH TACTILE SPST-NO 0.05A 12V" H 6750 5850 60  0001 L CNN "Description"
-F 11 "Omron Electronics Inc-EMC Div" H 6750 5950 60  0001 L CNN "Manufacturer"
-F 12 "Active" H 6750 6050 60  0001 L CNN "Status"
-	1    6550 4850
+P 6750 4500
+F 0 "S2" V 6697 4638 60  0000 L CNN
+F 1 "B3U-1000P" V 6450 4350 60  0000 L CNN
+F 2 "digikey-footprints:Switch_Tactile_SMD_B3U-1000P" H 6950 4700 60  0001 L CNN
+F 3 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 6950 4800 60  0001 L CNN
+F 4 "SW1020CT-ND" H 6950 4900 60  0001 L CNN "Digi-Key_PN"
+F 5 "B3U-1000P" H 6950 5000 60  0001 L CNN "MPN"
+F 6 "Switches" H 6950 5100 60  0001 L CNN "Category"
+F 7 "Tactile Switches" H 6950 5200 60  0001 L CNN "Family"
+F 8 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 6950 5300 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/omron-electronics-inc-emc-div/B3U-1000P/SW1020CT-ND/1534357" H 6950 5400 60  0001 L CNN "DK_Detail_Page"
+F 10 "SWITCH TACTILE SPST-NO 0.05A 12V" H 6950 5500 60  0001 L CNN "Description"
+F 11 "Omron Electronics Inc-EMC Div" H 6950 5600 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 6950 5700 60  0001 L CNN "Status"
+	1    6750 4500
 	0    1    1    0   
 $EndComp
-Connection ~ 6550 5050
+Connection ~ 6750 4700
 $Comp
 L dk_Tactile-Switches:B3U-1000P S3
 U 1 1 5B65D813
-P 7300 4850
-F 0 "S3" V 7247 4988 60  0000 L CNN
-F 1 "B3U-1000P" V 7000 4700 60  0000 L CNN
-F 2 "digikey-footprints:Switch_Tactile_SMD_B3U-1000P" H 7500 5050 60  0001 L CNN
-F 3 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 7500 5150 60  0001 L CNN
-F 4 "SW1020CT-ND" H 7500 5250 60  0001 L CNN "Digi-Key_PN"
-F 5 "B3U-1000P" H 7500 5350 60  0001 L CNN "MPN"
-F 6 "Switches" H 7500 5450 60  0001 L CNN "Category"
-F 7 "Tactile Switches" H 7500 5550 60  0001 L CNN "Family"
-F 8 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 7500 5650 60  0001 L CNN "DK_Datasheet_Link"
-F 9 "/product-detail/en/omron-electronics-inc-emc-div/B3U-1000P/SW1020CT-ND/1534357" H 7500 5750 60  0001 L CNN "DK_Detail_Page"
-F 10 "SWITCH TACTILE SPST-NO 0.05A 12V" H 7500 5850 60  0001 L CNN "Description"
-F 11 "Omron Electronics Inc-EMC Div" H 7500 5950 60  0001 L CNN "Manufacturer"
-F 12 "Active" H 7500 6050 60  0001 L CNN "Status"
-	1    7300 4850
+P 7500 4500
+F 0 "S3" V 7447 4638 60  0000 L CNN
+F 1 "B3U-1000P" V 7200 4350 60  0000 L CNN
+F 2 "digikey-footprints:Switch_Tactile_SMD_B3U-1000P" H 7700 4700 60  0001 L CNN
+F 3 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 7700 4800 60  0001 L CNN
+F 4 "SW1020CT-ND" H 7700 4900 60  0001 L CNN "Digi-Key_PN"
+F 5 "B3U-1000P" H 7700 5000 60  0001 L CNN "MPN"
+F 6 "Switches" H 7700 5100 60  0001 L CNN "Category"
+F 7 "Tactile Switches" H 7700 5200 60  0001 L CNN "Family"
+F 8 "http://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf" H 7700 5300 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/omron-electronics-inc-emc-div/B3U-1000P/SW1020CT-ND/1534357" H 7700 5400 60  0001 L CNN "DK_Detail_Page"
+F 10 "SWITCH TACTILE SPST-NO 0.05A 12V" H 7700 5500 60  0001 L CNN "Description"
+F 11 "Omron Electronics Inc-EMC Div" H 7700 5600 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 7700 5700 60  0001 L CNN "Status"
+	1    7500 4500
 	0    1    1    0   
 $EndComp
-Connection ~ 7300 5050
+Connection ~ 7500 4700
 $Comp
 L Mechanical:Mounting_Hole_PAD MK1
 U 1 1 5B65E194
@@ -1436,67 +1393,138 @@ Connection ~ 1550 2350
 $Comp
 L Device:R R4
 U 1 1 5B67003F
-P 5700 2250
-F 0 "R4" V 5493 2250 50  0000 C CNN
-F 1 "R" V 5584 2250 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 5630 2250 50  0001 C CNN
-F 3 "~" H 5700 2250 50  0001 C CNN
-	1    5700 2250
+P 7150 6000
+F 0 "R4" V 6943 6000 50  0000 C CNN
+F 1 "R" V 7034 6000 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 7080 6000 50  0001 C CNN
+F 3 "~" H 7150 6000 50  0001 C CNN
+	1    7150 6000
 	0    1    1    0   
 $EndComp
 $Comp
 L Device:R R5
 U 1 1 5B6700EE
-P 5700 2350
-F 0 "R5" V 5493 2350 50  0000 C CNN
-F 1 "R" V 5584 2350 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 5630 2350 50  0001 C CNN
-F 3 "~" H 5700 2350 50  0001 C CNN
-	1    5700 2350
+P 7150 6100
+F 0 "R5" V 6943 6100 50  0000 C CNN
+F 1 "R" V 7034 6100 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 7080 6100 50  0001 C CNN
+F 3 "~" H 7150 6100 50  0001 C CNN
+	1    7150 6100
 	0    1    1    0   
 $EndComp
 $Comp
 L Device:R R6
 U 1 1 5B670158
-P 5700 2450
-F 0 "R6" V 5493 2450 50  0000 C CNN
-F 1 "R" V 5584 2450 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 5630 2450 50  0001 C CNN
-F 3 "~" H 5700 2450 50  0001 C CNN
-	1    5700 2450
+P 7150 6200
+F 0 "R6" V 6943 6200 50  0000 C CNN
+F 1 "R" V 7034 6200 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 7080 6200 50  0001 C CNN
+F 3 "~" H 7150 6200 50  0001 C CNN
+	1    7150 6200
 	0    1    1    0   
 $EndComp
 $Comp
 L Device:R R7
 U 1 1 5B6701C4
-P 5700 2550
-F 0 "R7" V 5493 2550 50  0000 C CNN
-F 1 "R" V 5584 2550 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 5630 2550 50  0001 C CNN
-F 3 "~" H 5700 2550 50  0001 C CNN
-	1    5700 2550
+P 7150 6300
+F 0 "R7" V 6943 6300 50  0000 C CNN
+F 1 "R" V 7034 6300 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 7080 6300 50  0001 C CNN
+F 3 "~" H 7150 6300 50  0001 C CNN
+	1    7150 6300
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	5850 2250 6100 2250
+	7300 6000 7550 6000
 Wire Wire Line
-	5850 2250 5850 2350
-Connection ~ 5850 2250
-Connection ~ 5850 2350
+	7300 6000 7300 6100
+Connection ~ 7300 6000
+Connection ~ 7300 6100
 Wire Wire Line
-	5850 2350 5850 2450
-Connection ~ 5850 2450
+	7300 6100 7300 6200
+Connection ~ 7300 6200
 Wire Wire Line
-	5850 2450 5850 2550
+	7300 6200 7300 6300
 $Comp
 L power:VDD #PWR0102
 U 1 1 5B677313
-P 6100 2250
-F 0 "#PWR0102" H 6100 2100 50  0001 C CNN
-F 1 "VDD" H 6117 2423 50  0000 C CNN
-F 2 "" H 6100 2250 50  0001 C CNN
-F 3 "" H 6100 2250 50  0001 C CNN
-	1    6100 2250
+P 7550 6000
+F 0 "#PWR0102" H 7550 5850 50  0001 C CNN
+F 1 "VDD" H 7567 6173 50  0000 C CNN
+F 2 "" H 7550 6000 50  0001 C CNN
+F 3 "" H 7550 6000 50  0001 C CNN
+	1    7550 6000
 	1    0    0    -1  
 $EndComp
+Wire Notes Line
+	5450 5600 5450 3500
+Wire Notes Line
+	5450 5600 11250 5600
+Wire Notes Line
+	5450 3500 11250 3500
+Wire Notes Line
+	7750 5600 7750 6550
+Wire Notes Line
+	7750 3500 7750 450 
+NoConn ~ 3650 4450
+$Comp
+L power:GND #PWR0103
+U 1 1 5B56CCC8
+P 9750 1200
+F 0 "#PWR0103" H 9750 950 50  0001 C CNN
+F 1 "GND" H 9850 1200 50  0000 C CNN
+F 2 "" H 9750 1200 50  0001 C CNN
+F 3 "" H 9750 1200 50  0001 C CNN
+	1    9750 1200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9500 900  9500 1350
+Text Label 7300 4100 0    50   ~ 0
+BUTTON3
+Text Label 6550 4100 0    50   ~ 0
+BUTTON2
+Text Label 5800 4100 0    50   ~ 0
+BUTTON1
+Wire Wire Line
+	6550 4100 6550 4300
+Wire Wire Line
+	5800 4300 5800 4100
+Connection ~ 5800 4300
+Text Label 3650 4850 2    50   ~ 0
+BUTTON1
+Text Label 3650 4750 2    50   ~ 0
+BUTTON2
+Text Label 3650 4650 2    50   ~ 0
+BUTTON3
+Text Label 6550 6000 2    50   ~ 0
+LED1
+Text Label 6550 6100 2    50   ~ 0
+LED2
+Text Label 6550 6200 2    50   ~ 0
+LED3
+Text Label 6550 6300 2    50   ~ 0
+LED4
+Wire Wire Line
+	6550 6000 6700 6000
+Wire Wire Line
+	6550 6100 6700 6100
+Wire Wire Line
+	6550 6200 6700 6200
+Wire Wire Line
+	6550 6300 6700 6300
+Text Label 4950 4350 0    50   ~ 0
+LED1
+Text Label 4950 4450 0    50   ~ 0
+LED2
+Text Label 4950 4550 0    50   ~ 0
+LED3
+Text Label 4950 4650 0    50   ~ 0
+LED4
+Wire Notes Line
+	6250 5600 6250 6550
+Wire Notes Line
+	6250 6550 7000 6550
+Text Notes 6300 5700 0    50   ~ 10
+LEDS
 $EndSCHEMATC
