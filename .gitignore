@@ -1,4 +1,4 @@
-build/
+fw/build/
 *.elf
 *.map
 *.hex
