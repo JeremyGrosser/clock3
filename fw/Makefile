@@ -3,7 +3,7 @@ TOPDIR=.
 CPUS ?= 12
 MAKEFLAGS += -j$(CPUS)
 
-BOARD ?= stm32l152re
+BOARD ?= samd21xplained
 TARGET = clock3-$(BOARD)
 
 CFLAGS := -O0 -g -Wall -Werror -Wno-unused-variable -std=c11 -flto -fdata-sections -ffunction-sections

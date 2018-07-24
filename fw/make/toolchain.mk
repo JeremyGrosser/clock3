@@ -33,4 +33,4 @@ $(OBJS): $(BUILDDIR)/%.o: %
 
 clean:
 	@echo " CLEAN $(TARGET)"
-	@rm -rf $(BUILDDIR) $(TARGET).elf $(TARGET).bin $(TARGET).hex $(TARGET).map
+	@rm -rf $(BUILDDIR) $(TARGET).elf $(TARGET).bin $(TARGET).hex $(TARGET).map $(TARGET).lst
