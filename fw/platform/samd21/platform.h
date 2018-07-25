@@ -46,6 +46,8 @@ struct gpio_s {
 };
 
 struct spi_s {
+	uint32_t num;
+
 	gpio_t *mosi;
 	gpio_t *miso;
 	gpio_t *sck;
@@ -54,6 +56,14 @@ struct spi_s {
 	SercomSpi *sercom;
 };
 
+struct uart_s {
+	uint32_t num;
+
+	gpio_t *txd;
+	gpio_t *rxd;
+
+	SercomUsart *sercom;
+};
 
 void platform_init(void);
 

@@ -14,7 +14,8 @@ CMSIS := $(TOPDIR)/third_party/CMSIS
 SRCS += $(LOCAL_DIR)/platform.c \
 		$(LOCAL_DIR)/gpio.c \
 		$(LOCAL_DIR)/spi.c \
-		$(LOCAL_DIR)/gclk.c \
+		$(LOCAL_DIR)/uart.c \
+		$(LOCAL_DIR)/stubs.c \
 		$(LOCAL_DIR)/sysclk.c
 
 include $(CMSIS)/build.mk

@@ -1,6 +1,6 @@
 BUILDDIR ?= $(TOPDIR)/build/$(TARGET)
 
-LDFLAGS += -Wl,-gc-sections,-Map=$(TARGET).map,--cref
+LDFLAGS += --specs=nosys.specs --specs=nano.specs -Wl,-gc-sections,-Map=$(TARGET).map,--cref
 ifneq ($(LDSCRIPT),)
 	LDFLAGS := $(LDFLAGS),-T,$(LDSCRIPT)
 endif
@@ -24,7 +24,7 @@ OBJS := $(addprefix $(BUILDDIR)/,$(OBJS))
 
 %.lst: %.elf
 	@echo "   LST $@"
-	@$(OBJDUMP) -d $< >$@
+	@$(OBJDUMP) -dS $< >$@
 
 $(OBJS): $(BUILDDIR)/%.o: %
 	@echo "    CC $<"

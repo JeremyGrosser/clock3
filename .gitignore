@@ -3,5 +3,6 @@ fw/build/
 *.map
 *.hex
 *.bin
+*.lst
 *.swp
 *bak
