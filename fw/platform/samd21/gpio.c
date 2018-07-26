@@ -40,7 +40,11 @@ void gpio_setup(gpio_t *gpio) {
 }
 
 int gpio_read(gpio_t *gpio) {
-	return ((PORT->Group[gpio->port].IN.reg & gpio->mask) ? 1 : 0);
+	if(gpio->config.direction == DIR_IN) {
+		return (PORT->Group[gpio->port].IN.reg & gpio->mask) ? 1 : 0;
+	}else{
+		return (PORT->Group[gpio->port].OUT.reg & gpio->mask) ? 1 : 0;
+	}
 }
 
 void gpio_write(gpio_t *gpio, int state) {
@@ -51,3 +55,6 @@ void gpio_write(gpio_t *gpio, int state) {
 	}
 }
 
+void gpio_toggle(gpio_t *gpio) {
+	PORT->Group[gpio->port].OUTTGL.reg |= gpio->mask;
+}

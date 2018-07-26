@@ -1,6 +1,13 @@
 #include <platform/uart.h>
 #include <platform/gpio.h>
 #include <platform.h>
+#include "gclk.h"
+
+uint16_t uart_baud(uint32_t baud) {
+	float result;
+	result = 65536.0 * (1.0 - ((8.0 * (float)baud) / (float)SystemCoreClock));
+	return (uint16_t)result;
+}
 
 void uart_init(uart_t *uart) {
 	Sercom *sercom;
@@ -13,7 +20,7 @@ void uart_init(uart_t *uart) {
 
 	GCLK->CLKCTRL.reg = (
 			GCLK_CLKCTRL_ID(GCLK_CLKCTRL_ID_SERCOM0_CORE_Val + uart->num) |
-			GCLK_CLKCTRL_GEN(GCLK_CLKCTRL_GEN_GCLK0_Val) |
+			GCLK_CLKCTRL_GEN(GCLK_GEN_MAIN) |
 			GCLK_CLKCTRL_CLKEN);
 
 	// Enable the sercom clock
@@ -24,7 +31,7 @@ void uart_init(uart_t *uart) {
 	while(uart->sercom->SYNCBUSY.reg);
 
 	// This is 115200 baud, trust me
-	uart->sercom->BAUD.reg = 5138;
+	uart->sercom->BAUD.reg = uart_baud(115200); // 5138
 
 	uart->sercom->CTRLA.reg = (
 			SERCOM_USART_CTRLA_MODE_USART_INT_CLK |

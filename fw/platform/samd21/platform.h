@@ -7,6 +7,8 @@
 
 #include <platform/gpio.h>
 
+#include <stdint.h>
+
 struct pincfg_s {
     enum {
         DIR_IN  = 0,
@@ -66,5 +68,6 @@ struct uart_s {
 };
 
 void platform_init(void);
+uint32_t get_ticks(void);
 
 #endif
