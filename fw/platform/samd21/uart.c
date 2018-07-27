@@ -26,7 +26,7 @@ void uart_init(uart_t *uart) {
 	// Enable the sercom clock
 	PM->APBCMASK.reg |= (1 << (uart->num + 2));
 
-	uart->sercom->INTENCLR.reg = !0;
+	uart->sercom->INTENCLR.reg = 0xFF;
 	uart->sercom->CTRLA.bit.SWRST = 1;
 	while(uart->sercom->SYNCBUSY.reg);
 

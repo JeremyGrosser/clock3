@@ -50,7 +50,7 @@ gpio_t I2C_SDA = {
 		.drive		= DRIVE_LOW,
 		.pull		= PULL_ENABLE,
 		.pmux		= PMUX_ENABLE,
-		.pmux_function = MUX_PA08C_SERCOM_PAD0,
+		.pmux_function = MUX_PA08C_SERCOM0_PAD0,
 	},
 };
 
@@ -61,7 +61,7 @@ gpio_t I2C_SCL = {
 		.drive		= DRIVE_LOW,
 		.pull		= PULL_ENABLE,
 		.pmux		= PMUX_ENABLE,
-		.pmux_function = MUX_PA09C_SERCOM_PAD1,
+		.pmux_function = MUX_PA09C_SERCOM0_PAD1,
 	},
 };
 

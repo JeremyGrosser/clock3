@@ -4,6 +4,7 @@
 #include <platform.h>
 #include <platform/gpio.h>
 #include <platform/uart.h>
+#include <platform/i2c.h>
 #include <platform/rtc.h>
 
 #define LED_ON	0
