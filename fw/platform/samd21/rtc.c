@@ -3,9 +3,19 @@
 #include <platform.h>
 #include "gclk.h"
 
+#include <sys/time.h>
 #include <stdio.h>
 
-static datetime_t rtc_now = {0};
+static struct tm rtc_now = {
+	.tm_year	= 70,
+	.tm_mon		= 0,
+	.tm_mday	= 1,
+	.tm_hour	= 0,
+	.tm_min		= 0,
+	.tm_sec		= 0,
+	.tm_isdst	= -1,
+};
+
 static uint32_t rtc_alarm = 0;
 
 void rtc_init(void) {
@@ -80,8 +90,6 @@ void rtc_init(void) {
 	// Keep running while debugging
 	hw->DBGCTRL.reg = RTC_DBGCTRL_DBGRUN;
 
-	hw->READREQ.reg = 0;
-
 	// Enable ALARM0 interrupt
 	hw->INTENSET.reg = RTC_MODE2_INTENSET_ALARM0;
 	hw->INTFLAG.reg = 0xFF;
@@ -100,8 +108,40 @@ void rtc_init(void) {
 	while(hw->STATUS.bit.SYNCBUSY);
 }
 
-datetime_t rtc_read(void) {
-	return rtc_now;
+struct tm *rtc_read(void) {
+	/*
+	RtcMode2 *hw = &RTC->MODE2;
+
+	hw->READREQ.reg = RTC_READREQ_RREQ;
+	while(hw->STATUS.bit.SYNCBUSY);
+
+	rtc_now.tm_year = hw->CLOCK.bit.YEAR + 70;
+	rtc_now.tm_mon = hw->CLOCK.bit.MONTH - 1;
+	rtc_now.tm_mday = hw->CLOCK.bit.DAY;
+	rtc_now.tm_hour = hw->CLOCK.bit.HOUR;
+	rtc_now.tm_min = hw->CLOCK.bit.MINUTE;
+	rtc_now.tm_sec = hw->CLOCK.bit.SECOND;
+	rtc_now.tm_isdst = -1;
+	*/
+
+	if(rtc_now.tm_mon < 0) {
+		return NULL;
+	}
+
+	return &rtc_now;
+}
+
+void rtc_write(struct tm *now) {
+	RtcMode2 *hw = &RTC->MODE2;
+
+	hw->CLOCK.reg = (
+			RTC_MODE2_CLOCK_YEAR(now->tm_year - 70) |
+			RTC_MODE2_CLOCK_MONTH(now->tm_mon + 1) |
+			RTC_MODE2_CLOCK_DAY(now->tm_mday) |
+			RTC_MODE2_CLOCK_HOUR(now->tm_hour) |
+			RTC_MODE2_CLOCK_MINUTE(now->tm_min) |
+			RTC_MODE2_CLOCK_SECOND(now->tm_sec));
+	while(hw->STATUS.bit.SYNCBUSY);
 }
 
 void RTC_Handler(void) {
@@ -110,12 +150,13 @@ void RTC_Handler(void) {
 	hw->READREQ.reg = RTC_READREQ_RREQ;
 	while(hw->STATUS.bit.SYNCBUSY);
 
-	rtc_now.day = hw->CLOCK.bit.DAY;
-	rtc_now.month = hw->CLOCK.bit.MONTH;
-	rtc_now.year = hw->CLOCK.bit.YEAR;
-	rtc_now.hour = hw->CLOCK.bit.HOUR;
-	rtc_now.minute = hw->CLOCK.bit.MINUTE;
-	rtc_now.second = hw->CLOCK.bit.SECOND;
+	rtc_now.tm_year = hw->CLOCK.bit.YEAR + 70;
+	rtc_now.tm_mon = hw->CLOCK.bit.MONTH - 1;
+	rtc_now.tm_mday = hw->CLOCK.bit.DAY;
+	rtc_now.tm_hour = hw->CLOCK.bit.HOUR;
+	rtc_now.tm_min = hw->CLOCK.bit.MINUTE;
+	rtc_now.tm_sec = hw->CLOCK.bit.SECOND;
+	rtc_now.tm_isdst = 0;
 
 	hw->INTFLAG.reg = 0xFF;
 }

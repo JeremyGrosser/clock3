@@ -36,19 +36,51 @@ gpio_t CONSOLE_RXD = {
 };
 
 uart_t CONSOLE_UART = {
-	.num = 3,
-	.sercom = &SERCOM3->USART,
-	.txd = &CONSOLE_TXD,
-	.rxd = &CONSOLE_RXD,
+	.num	= 3,
+	.txd	= &CONSOLE_TXD,
+	.rxd	= &CONSOLE_RXD,
+	.tx_pad = 0,
+	.rx_pad = 1,
+};
+
+gpio_t I2C_SDA = {
+	.num	= PIN_PA08,
+	.config = {
+		.direction	= DIR_OUT,
+		.drive		= DRIVE_LOW,
+		.pull		= PULL_ENABLE,
+		.pmux		= PMUX_ENABLE,
+		.pmux_function = MUX_PA08C_SERCOM_PAD0,
+	},
+};
+
+gpio_t I2C_SCL = {
+	.num	= PIN_PA09,
+	.config	= {
+		.direction	= DIR_OUT,
+		.drive		= DRIVE_LOW,
+		.pull		= PULL_ENABLE,
+		.pmux		= PMUX_ENABLE,
+		.pmux_function = MUX_PA09C_SERCOM_PAD1,
+	},
+};
+
+i2c_t DISPLAY_I2C = {
+	.num	= 0,
+	.scl	= &I2C_SCL,
+	.sda	= &I2C_SDA,
 };
 
 void board_init() {
 	platform_init();
 	uart_init(&CONSOLE_UART);
 
-	printf("board_init\r\n");
+	// ANSI clear sequence
+	printf("\033[2J\033[0;0H");
+	printf("\r\nboard_init\r\n");
 
 	rtc_init();
+	i2c_init(&DISPLAY_I2C);
 
 	//gpio_setup(&STATUS_LED);
 	//gpio_write(&STATUS_LED, LED_ON);

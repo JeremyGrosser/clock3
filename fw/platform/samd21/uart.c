@@ -35,8 +35,8 @@ void uart_init(uart_t *uart) {
 
 	uart->sercom->CTRLA.reg = (
 			SERCOM_USART_CTRLA_MODE_USART_INT_CLK |
-			SERCOM_USART_CTRLA_RXPO(1) |
-			SERCOM_USART_CTRLA_TXPO(0) |
+			SERCOM_USART_CTRLA_RXPO(uart->rx_pad) |
+			SERCOM_USART_CTRLA_TXPO(uart->tx_pad) |
 			SERCOM_USART_CTRLA_DORD |
 			SERCOM_USART_CTRLA_SAMPR(2)
 			);

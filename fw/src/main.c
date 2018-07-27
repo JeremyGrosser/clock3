@@ -1,5 +1,4 @@
 #include <platform/gpio.h>
-#include <platform/rtc.h>
 #include <platform.h>
 #include <board.h>
 
@@ -7,16 +6,25 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <sys/time.h>
+#include <errno.h>
+
 int main(void) {
-	datetime_t now;
+	struct tm *now;
+	struct timeval tv;
+	char buf[128];
+	int err;
 
 	board_init();
 
 	while(1) {
-		now = rtc_read();
-		printf("%04lu-%02lu-%02lu %02lu:%02lu:%02lu\r\n",
-				now.year, now.month, now.day,
-				now.hour, now.minute, now.second);
+		err = gettimeofday(&tv, NULL);
+		if(err != 0) {
+			printf("gettimeofday failed: %s\r\n", strerror(errno));
+		}else{
+			strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", gmtime(&tv.tv_sec));
+			printf("%s\r\n", buf);
+		}
 		__WFI();
 	}
 

@@ -55,6 +55,10 @@ struct spi_s {
 	gpio_t *sck;
 	gpio_t *nss;
 
+	uint8_t mosi_pad;
+	uint8_t miso_pad;
+	uint8_t sck_pad;
+
 	SercomSpi *sercom;
 };
 
@@ -64,7 +68,19 @@ struct uart_s {
 	gpio_t *txd;
 	gpio_t *rxd;
 
+	uint8_t tx_pad;
+	uint8_t rx_pad;
+
 	SercomUsart *sercom;
+};
+
+struct i2c_s {
+	uint32_t num;
+
+	gpio_t *scl;
+	gpio_t *sda;
+
+	SercomI2cm *sercom;
 };
 
 void platform_init(void);

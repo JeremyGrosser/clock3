@@ -15,5 +15,6 @@ struct atw_s {
 typedef struct atw_s atw_t;
 
 void atw_setup(atw_t *atw);
+void atw_systick(atw_t *atw);
 
 #endif
