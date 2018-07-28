@@ -19,4 +19,5 @@ debug:
 
 include make/macros.mk
 include boards/$(BOARD)/build.mk
+include driver/ht16k33/build.mk
 include make/toolchain.mk

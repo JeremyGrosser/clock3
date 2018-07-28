@@ -10,10 +10,13 @@
 #define LED_ON	0
 #define LED_OFF	1
 
+#define DISPLAY_ADDR	0xE0
+
 extern gpio_t STATUS_LED;
 extern gpio_t CONSOLE_TXD;
 extern gpio_t CONSOLE_RXD;
 extern uart_t CONSOLE_UART;
+extern i2c_t DISPLAY_I2C;
 
 void board_init();
 void console_write(uint8_t *msg, size_t len);
