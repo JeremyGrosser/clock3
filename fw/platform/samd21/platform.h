@@ -84,6 +84,6 @@ struct i2c_s {
 };
 
 void platform_init(void);
-uint32_t get_ticks(void);
+uint32_t platform_ticks(void);
 
 #endif

@@ -12,7 +12,7 @@ static int ht16k33_writereg(ht16k33_t *dev, uint8_t reg, uint8_t value) {
 
 int ht16k33_setup(ht16k33_t *dev) {
 	int err;
-	int i;
+	int i, j;
 	uint8_t data[17];
 
 	// Enable system oscillator
@@ -27,19 +27,26 @@ int ht16k33_setup(ht16k33_t *dev) {
 		return err;
 	}
 
-	i = 0;
-	while(1) {
-		if((get_ticks() % 100) != 0) {
-			continue;
-		}
-		i = (i + 1) % 6;
-		memset(data, (1 << i), 17);
-		data[0] = 0x00;
-		err = i2c_write(dev->i2c, dev->i2c_addr, data, 17);
-		if(err != 0) {
-			return err;
-		}
-	}
+	memset(dev->state, 0x00, (sizeof(dev->state) / sizeof(uint8_t)));
 
-	return 0;
+	err = ht16k33_flush(dev);
+
+	return err;
+}
+
+void ht16k33_set(ht16k33_t *dev, uint8_t column, uint8_t row) {
+	dev->state[column] = row;
+}
+
+int ht16k33_flush(ht16k33_t *dev) {
+	uint8_t data[17];
+	int err;
+	int i;
+
+	data[0] = 0x00;
+	for(i = 0; i < 16; i++) {
+		data[i+1] = dev->state[i];
+	}
+	err = i2c_write(dev->i2c, dev->i2c_addr, data, 17);
+	return err;
 }

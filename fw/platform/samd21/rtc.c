@@ -16,7 +16,9 @@ static struct tm rtc_now = {
 	.tm_isdst	= -1,
 };
 
-static uint32_t rtc_alarm = 0;
+// Track the value of platform_ticks() as of the last RTC read and use that to
+// calculate seconds
+static uint32_t rtc_ticks = 1000;
 
 void rtc_init(void) {
 	RtcMode2 *hw = &RTC->MODE2;
@@ -52,30 +54,12 @@ void rtc_init(void) {
 	GCLK->GENDIV.reg = (
 			GCLK_GENDIV_ID(GCLK_GEN_RTC) |
 			GCLK_GENDIV_DIV(32));
-
-	GCLK->CLKCTRL.reg = (
-			GCLK_CLKCTRL_ID_RTC |
-			GCLK_CLKCTRL_GEN(GCLK_GEN_RTC) |
-			GCLK_CLKCTRL_CLKEN);
-	while(GCLK->STATUS.bit.SYNCBUSY);
-
-	/*
-	 * XXX: THIS WORKS
-	GCLK->GENCTRL.reg = (
-			GCLK_GENCTRL_ID(GCLK_GEN_RTC) |
-			GCLK_GENCTRL_SRC_OSCULP32K |
-			GCLK_GENCTRL_GENEN);
 	
-	GCLK->GENDIV.reg = (
-			GCLK_GENDIV_ID(GCLK_GEN_RTC) |
-			GCLK_GENDIV_DIV(32));
-
 	GCLK->CLKCTRL.reg = (
 			GCLK_CLKCTRL_ID_RTC |
 			GCLK_CLKCTRL_GEN(GCLK_GEN_RTC) |
 			GCLK_CLKCTRL_CLKEN);
 	while(GCLK->STATUS.bit.SYNCBUSY);
-	*/
 
 	PM->APBAMASK.reg |= PM_APBAMASK_RTC;
 
@@ -84,8 +68,11 @@ void rtc_init(void) {
 	while(hw->STATUS.bit.SYNCBUSY);
 
 	// Reset
+	/* If we're lucky, the RTC might already have the current time, so let's
+	 * not reset it.
 	hw->CTRL.reg = RTC_MODE2_CTRL_SWRST;
 	while(hw->STATUS.bit.SYNCBUSY);
+	*/
 
 	// Keep running while debugging
 	hw->DBGCTRL.reg = RTC_DBGCTRL_DBGRUN;
@@ -106,6 +93,9 @@ void rtc_init(void) {
 	hw->Mode2Alarm[0].ALARM.reg = 0;
 	hw->Mode2Alarm[0].MASK.reg = RTC_MODE2_MASK_SEL_SS;
 	while(hw->STATUS.bit.SYNCBUSY);
+
+	// Trigger the interrupt manually once to force an initial read
+	RTC_Handler();
 }
 
 struct tm *rtc_read(void) {
@@ -125,6 +115,13 @@ struct tm *rtc_read(void) {
 	*/
 
 	if(rtc_now.tm_mon < 0) {
+		return NULL;
+	}
+
+	rtc_now.tm_sec = (platform_ticks() - rtc_ticks) / 1000;
+	if(rtc_now.tm_sec > 65) {
+		// For some reason, the RTC interrupt hasn't fired in the last minute,
+		// so don't return incorrect time data
 		return NULL;
 	}
 
@@ -149,6 +146,8 @@ void RTC_Handler(void) {
 
 	hw->READREQ.reg = RTC_READREQ_RREQ;
 	while(hw->STATUS.bit.SYNCBUSY);
+
+	rtc_ticks = platform_ticks();
 
 	rtc_now.tm_year = hw->CLOCK.bit.YEAR + 70;
 	rtc_now.tm_mon = hw->CLOCK.bit.MONTH - 1;

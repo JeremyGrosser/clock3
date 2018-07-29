@@ -17,7 +17,7 @@ int main(void) {
 	struct tm *now;
 	struct timeval tv;
 	char buf[128];
-	int err;
+	int i, err;
 
 	board_init();
 
@@ -36,6 +36,25 @@ int main(void) {
 		}else{
 			strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", gmtime(&tv.tv_sec));
 			printf("%s\r\n", buf);
+
+			now = rtc_read();
+			if(now->tm_hour > 0) {
+				ht16k33_set(&display, ht16k33_column[0], ht16k33_digit[now->tm_hour / 10]);
+				ht16k33_set(&display, ht16k33_column[1], ht16k33_digit[now->tm_hour % 10]);
+			}else{
+				ht16k33_set(&display, ht16k33_column[0], ht16k33_digit[0]);
+				ht16k33_set(&display, ht16k33_column[1], ht16k33_digit[0]);
+			}
+
+			if(now->tm_min > 0) {
+				ht16k33_set(&display, ht16k33_column[2], ht16k33_digit[now->tm_min / 10]);
+				ht16k33_set(&display, ht16k33_column[3], ht16k33_digit[now->tm_min % 10]);
+			}else{
+				ht16k33_set(&display, ht16k33_column[2], ht16k33_digit[0]);
+				ht16k33_set(&display, ht16k33_column[3], ht16k33_digit[0]);
+			}
+			ht16k33_set(&display, ht16k33_column[4], ht16k33_colon);
+			ht16k33_flush(&display);
 		}
 		__WFI();
 	}
