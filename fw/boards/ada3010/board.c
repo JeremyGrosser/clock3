@@ -3,10 +3,9 @@
 #include <platform/gpio.h>
 #include <platform/spi.h>
 #include <platform/uart.h>
-#include <dev/atw.h>
 
 gpio_t STATUS_LED = {
-	.num	= PIN_PB11,
+	.num	= PIN_PA17,
 	.config	= {
 		.direction	= DIR_OUT,
 		.drive		= DRIVE_LOW,
@@ -15,6 +14,7 @@ gpio_t STATUS_LED = {
 	},
 };
 
+/*
 gpio_t ATW_CS = {
 	.num	= PIN_PA06,
 	.config	= {
@@ -120,15 +120,17 @@ uart_t CONSOLE_UART = {
 };
 
 static atw_t wifi;
+*/
 
 void board_init() {
-	spi_t spi;
+	//spi_t spi;
 
 	platform_init();
 
 	gpio_setup(&STATUS_LED);
 	gpio_write(&STATUS_LED, LED_ON);
 
+	/*
 	spi.sercom	= &SERCOM4->SPI;
 	spi.mosi	= &ATW_MOSI;
 	spi.miso	= &ATW_MISO;
@@ -144,8 +146,9 @@ void board_init() {
 	wifi.gpio_chip_en	= &ATW_CHIP_EN;
 
 	//atw_setup(&wifi);
+	*/
 }
 
 void console_write(uint8_t *msg, size_t len) {
-	uart_write(&CONSOLE_UART, msg, len);
+	//uart_write(&CONSOLE_UART, msg, len);
 }

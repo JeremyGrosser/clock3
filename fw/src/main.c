@@ -21,6 +21,13 @@ int main(void) {
 
 	board_init();
 
+
+	while(1) {
+		if((platform_ticks() % 512) == 0)  {
+			gpio_toggle(&STATUS_LED);
+		}
+	}
+	/*
 	display.i2c = &DISPLAY_I2C;
 	display.i2c_addr = DISPLAY_ADDR;
 
@@ -58,6 +65,7 @@ int main(void) {
 		}
 		__WFI();
 	}
+	*/
 
 	// rtc alarm interrupt every minute
 	// update clock display registers
