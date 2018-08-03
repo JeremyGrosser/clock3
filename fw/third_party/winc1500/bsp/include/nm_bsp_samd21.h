@@ -2,9 +2,9 @@
  *
  * \file
  *
- * \brief This module contains SAMD21 BSP APIs declarations.
+ * \brief This module contains NMC1500 BSP APIs definitions.
  *
- * Copyright (c) 2016-2017 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -42,12 +42,11 @@
 #ifndef _NM_BSP_SAMD21_H_
 #define _NM_BSP_SAMD21_H_
 
-#include "conf_winc.h"
-#include "math.h"
+#define NM_DEBUG			0
+#define NM_BSP_PRINTF
 
-#define NM_EDGE_INTERRUPT		(1)
+#define CONF_WINC_USE_SPI	1
 
-#define NM_DEBUG				CONF_WINC_DEBUG
-#define NM_BSP_PRINTF			CONF_WINC_PRINTF
+#define NM_EDGE_INTERRUPT	1
 
 #endif /* _NM_BSP_SAMD21_H_ */

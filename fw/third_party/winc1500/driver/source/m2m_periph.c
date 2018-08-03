@@ -4,7 +4,7 @@
  *
  * \brief NMC1500 Peripherials Application Interface.
  *
- * Copyright (c) 2016-2017 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -47,8 +47,6 @@ INCLUDES
 #include "driver/include/m2m_periph.h"
 #include "driver/source/nmasic.h"
 #include "m2m_hif.h"
-
-#ifdef CONF_PERIPH
 
 /*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 MACROS
@@ -111,6 +109,8 @@ FUNCTION IMPLEMENTATION
 
 sint8 m2m_periph_init(tstrPerphInitParam * param)
 {
+	(void)param; // Silence "unused" warning
+
 	return M2M_SUCCESS;
 }
 
@@ -126,30 +126,52 @@ sint8 m2m_periph_gpio_set_val(uint8 u8GpioNum, uint8 u8GpioVal)
 
 sint8 m2m_periph_gpio_get_val(uint8 u8GpioNum, uint8 * pu8GpioVal)
 {
+	(void)u8GpioNum; // Silence "unused" warning
+
 	return gpio_ioctl(GPIO_OP_GET, u8GpioNum, 0, pu8GpioVal);
 }
 
 sint8 m2m_periph_gpio_pullup_ctrl(uint8 u8GpioNum, uint8 u8PullupEn)
 {
-	/* TBD */
+	// Silence "unused" warning
+	(void)u8GpioNum;
+	(void)u8PullupEn;
+
+	/* XXX: TBD */
 	return M2M_SUCCESS;
 }
 
 sint8 m2m_periph_i2c_master_init(tstrI2cMasterInitParam * param)
 {
-	/* TBD */
+	// Silence "unused" warning
+	(void)param;
+
+	/* XXX: TBD */
 	return M2M_SUCCESS;
 }
 
 sint8 m2m_periph_i2c_master_write(uint8 u8SlaveAddr, uint8 * pu8Buf, uint16 u16BufLen, uint8 flags)
 {
-	/* TBD */
+	// Silence "unused" warning
+	(void)u8SlaveAddr;
+	(void)pu8Buf;
+	(void)u16BufLen;
+	(void)flags;
+
+	/* XXX: TBD */
 	return M2M_SUCCESS;
 }
 
 sint8 m2m_periph_i2c_master_read(uint8 u8SlaveAddr, uint8 * pu8Buf, uint16 u16BufLen, uint16 * pu16ReadLen, uint8 flags)
 {
-	/* TBD */
+	// Silence "unused" warning
+	(void)u8SlaveAddr;
+	(void)pu8Buf;
+	(void)u16BufLen;
+	(void)pu16ReadLen;
+	(void)flags;
+
+	/* XXX: TBD */
 	return M2M_SUCCESS;
 }
 
@@ -158,4 +180,3 @@ sint8 m2m_periph_pullup_ctrl(uint32 pinmask, uint8 enable)
 {
 	return pullup_ctrl(pinmask, enable);
 }
-#endif /* CONF_PERIPH */
