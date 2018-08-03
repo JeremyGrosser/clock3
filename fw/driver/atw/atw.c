@@ -1,37 +1,97 @@
 #include <platform/gpio.h>
 #include <platform/spi.h>
-#include <dev/atw.h>
+#include <driver/atw.h>
+#include <platform.h>
 
-typedef void (*atw_isr_function)(void);
+#include <nm_bus_wrapper.h>
+#include <m2m_wifi.h>
 
-static atw_isr_function isr = NULL;
+#define NM_BUS_MAX_TRX_SZ 256
+tstrNmBusCapabilities egstrNmBusCapabilities = {
+	NM_BUS_MAX_TRX_SZ
+};
 
-void atw_setup(atw_t *atw) {
-	tstrWifiInitParam param = {0}
+// The nm API methods don't pass a reference, so we have to keep our context
+// global and only run one atw at a time. lame.
+static atw_t *atw_g = NULL;
+
+void nm_bsp_sleep(uint32_t ms) {
+	platform_delay(ms);
+}
+
+void nm_bsp_register_isr(tpfNmBspIsr pfIsr) {
+	atw_g->irq_handler = (atw_irq_handler_t)pfIsr;
+}
+
+void nm_bsp_interrupt_ctrl(uint8_t enable) {
+	atw_g->irq_enabled = enable;
+}
+
+int8_t nm_bus_init(void *initvalue) {
+	// nm_bsp_init
+	gpio_setup(atw_g->gpio_rst);
+	gpio_setup(atw_g->gpio_chip_en);
+	gpio_setup(atw_g->gpio_irq);
+	gpio_write(atw_g->gpio_rst, 1);
+
+	// nm_bsp_reset
+	gpio_write(atw_g->gpio_chip_en, 1);
+	platform_delay(100);
+	gpio_write(atw_g->gpio_rst, 0);
+	platform_delay(100);
+	gpio_write(atw_g->gpio_rst, 1);
+	platform_delay(100);
+
+	spi_begin(atw_g->spi);
+	return 0;
+}
+
+int8_t nm_bus_deinit(void) {
+	gpio_write(atw_g->gpio_chip_en, 0);
+	return 0;
+}
+
+int8_t nm_bus_ioctl(uint8_t cmd, void *param) {
+	// Send/receive
+	tstrNmSpiRw *spi_param;
+	uint16_t i;
+	uint8_t out;
+
+	if(cmd != NM_BUS_IOCTL_RW) {
+		return -1;
+	}
+
+	spi_param = (tstrNmSpiRw *)param;
+
+	spi_begin(atw_g->spi);
+	for(i = 0; i < spi_param->u16Sz; i++) {
+		out = spi_transfer(atw_g->spi, spi_param->pu8InBuf[i]);
+		if(spi_param->pu8OutBuf != NULL) {
+			spi_param->pu8OutBuf[i] = out;
+		}
+	}
+	spi_end(atw_g->spi);
+
+	return 0;
+}
+
+int atw_setup(atw_t *atw) {
+	tstrWifiInitParam param;
 	int err;
 
-	// nm_bsp_init
-	gpio_setup(atw->gpio_rst);
-	gpio_setup(atw->gpio_chip_en);
-	gpio_setup(atw->gpio_irq);
+	if(atw_g != NULL) {
+		return 1;
+	}
+	atw_g = atw;
 
-	gpio_write(atw->gpio_chip_en, 0);
-	gpio_write(atw->gpio_rst, 0);
+	atw->irq_enabled = 0;
+	m2m_wifi_init(&param);
 
-	// 1ms SysTick?
-	//SysTickConfig(SystemCoreClock / 1000);
-
-	// TODO: call atw_interrupt every time gpio_irq 0->1
-	
-	err = m2m_wifi_init(&param);
+	return 0;
 }
 
 void atw_interrupt(atw_t *atw) {
-	if(isr != NULL) {
-		isr();
+	if(atw->irq_enabled != 0) {
+		atw->irq_handler();
 	}
-}
-
-void nm_bsp_register_isr(atw_isr_function new_isr) {
-	isr = new_isr;
 }

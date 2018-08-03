@@ -3,6 +3,7 @@
 #include <platform/gpio.h>
 #include <platform/spi.h>
 #include <platform/uart.h>
+#include <driver/atw.h>
 
 gpio_t STATUS_LED = {
 	.num	= PIN_PA17,
@@ -14,7 +15,6 @@ gpio_t STATUS_LED = {
 	},
 };
 
-/*
 gpio_t ATW_CS = {
 	.num	= PIN_PA06,
 	.config	= {
@@ -36,11 +36,11 @@ gpio_t ATW_RST = {
 };
 
 gpio_t ATW_IRQ = {
-	.num	= PIN_PA08,
+	.num	= PIN_PA21,
 	.config	= {
 		.direction	= DIR_OUT,
 		.drive		= DRIVE_LOW,
-		.pull		= PULL_ENABLE,
+		.pull		= PULL_DISABLE,
 		.pmux		= PMUX_DISABLE,
 	},
 };
@@ -120,18 +120,16 @@ uart_t CONSOLE_UART = {
 };
 
 static atw_t wifi;
-*/
 
 void board_init() {
-	//spi_t spi;
+	spi_t spi;
 
 	platform_init();
 
 	gpio_setup(&STATUS_LED);
 	gpio_write(&STATUS_LED, LED_ON);
 
-	/*
-	spi.sercom	= &SERCOM4->SPI;
+	spi.num		= 4;
 	spi.mosi	= &ATW_MOSI;
 	spi.miso	= &ATW_MISO;
 	spi.sck		= &ATW_SCK;
@@ -140,15 +138,20 @@ void board_init() {
 	spi.mosi_pad = 2;
 	spi.sck_pad	= 3;
 
+	spi_setup(&spi);
+
 	wifi.spi			= &spi;
 	wifi.gpio_rst		= &ATW_RST;
 	wifi.gpio_irq		= &ATW_IRQ;
 	wifi.gpio_chip_en	= &ATW_CHIP_EN;
 
-	//atw_setup(&wifi);
-	*/
+	atw_setup(&wifi);
 }
 
 void console_write(uint8_t *msg, size_t len) {
-	//uart_write(&CONSOLE_UART, msg, len);
+	uart_write(&CONSOLE_UART, msg, len);
+}
+
+void SERCOM4_Handler() {
+	spi_interrupt(wifi.spi);
 }

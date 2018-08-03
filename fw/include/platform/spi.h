@@ -7,7 +7,8 @@ typedef struct spi_s spi_t;
 
 void spi_setup(spi_t *spi);
 void spi_begin(spi_t *spi);
-uint32_t spi_transfer(spi_t *spi, uint32_t data);
+uint8_t spi_transfer(spi_t *spi, uint8_t data);
 void spi_end(spi_t *spi);
+void spi_interrupt(spi_t *spi);
 
 #endif

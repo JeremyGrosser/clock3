@@ -23,3 +23,8 @@ void SysTick_Handler(void) {
 uint32_t platform_ticks(void) {
 	return ticks;
 }
+
+void platform_delay(uint32_t ms) {
+	uint32_t until = ticks + ms;
+	while(ticks < until);
+}
