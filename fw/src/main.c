@@ -25,9 +25,13 @@ int main(void) {
 
 	board_init();
 
-	atw_connect_wpa(&wifi, (uint8_t *)WIFI_SSID, strlen(WIFI_SSID), (uint8_t *)WIFI_PSK, strlen(WIFI_PSK));
+	err = atw_connect_wpa(&wifi, (uint8_t *)WIFI_SSID, strlen(WIFI_SSID), (uint8_t *)WIFI_PSK, strlen(WIFI_PSK));
+	if(err != 0) {
+		printf("atw_connect_wpa failed\r\n");
+	}
 
 	while(1) {
+		atw_handle_events(&wifi);
 		if((platform_ticks() % 512) == 0)  {
 			gpio_toggle(&STATUS_LED);
 		}
@@ -79,5 +83,6 @@ int main(void) {
 	// if hour==0 and minute==0
 	// 	wake wifi module
 	//	update rtc time from NTP or HTTPS
+	
 	return 0;
 }

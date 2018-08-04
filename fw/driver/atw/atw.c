@@ -6,6 +6,7 @@
 #include <nm_bus_wrapper.h>
 #include <m2m_wifi.h>
 #include <m2m_types.h>
+#include <m2m_periph.h>
 
 #include <string.h>
 
@@ -77,6 +78,9 @@ int8_t nm_bus_ioctl(uint8_t cmd, void *param) {
 	return 0;
 }
 
+static void atw_callback(uint8_t u8MsgType, void *pvMsg) {
+}
+
 int atw_setup(atw_t *atw) {
 	tstrWifiInitParam param;
 	int err;
@@ -88,6 +92,8 @@ int atw_setup(atw_t *atw) {
 
 	atw->irq_enabled = 0;
 	atw->irq_handler = NULL;
+
+	param.pfAppWifiCb = &atw_callback;
 	err = m2m_wifi_init(&param);
 	if(err != 0) {
 		return err;
@@ -115,4 +121,8 @@ void atw_interrupt(atw_t *atw) {
 	if(atw->irq_enabled != 0 && atw->irq_handler != NULL) {
 		atw->irq_handler();
 	}
+}
+
+void atw_handle_events(atw_t *atw) {
+	m2m_wifi_handle_events(NULL);
 }

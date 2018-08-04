@@ -7,7 +7,8 @@ MAKEFLAGS += -j$(CPUS)
 BOARD ?= ada3010
 TARGET = clock3-$(BOARD)
 
-CFLAGS := -O0 -g -Wall -Werror -Wno-unused-variable -std=c11 -flto -fdata-sections -ffunction-sections -fno-builtin
+#CFLAGS := -O0 -g -Wall -Werror -Wno-unused-variable -std=c11 -flto -fdata-sections -ffunction-sections -ffreestanding
+CFLAGS := -O0 -g -Wall -Werror -Wno-unused-variable -std=c11 -flto -ffreestanding
 #CFLAGS := -O0 -g -Wall -Werror -std=c11
 
 SRCS := $(wildcard src/*.c)

@@ -23,5 +23,6 @@ int atw_setup(atw_t *atw);
 void atw_systick(atw_t *atw);
 void atw_interrupt(atw_t *atw);
 int atw_connect_wpa(atw_t *atw, uint8_t *ssid, size_t ssid_len, uint8_t *psk, size_t psk_len);
+void atw_handle_events(atw_t *atw);
 
 #endif
