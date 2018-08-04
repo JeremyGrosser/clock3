@@ -48,6 +48,10 @@
 #ifndef _NM_BSP_H_
 #define _NM_BSP_H_
 
+#include <stdio.h>
+#define CONF_WINC_PRINTF printf
+#define CONF_WINC_DEBUG 1
+
 #define NMI_API
 /*!< 
 *        Attribute used to define memory section to map Functions in host memory.

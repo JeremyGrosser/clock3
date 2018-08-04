@@ -11,6 +11,10 @@
 #include <errno.h>
 
 #include <driver/ht16k33.h>
+#include <driver/atw.h>
+
+static const char *WIFI_SSID = "sierra24";
+static const char *WIFI_PSK = "whatevenisapassword";
 
 int main(void) {
 	ht16k33_t display;
@@ -21,6 +25,7 @@ int main(void) {
 
 	board_init();
 
+	atw_connect_wpa(&wifi, (uint8_t *)WIFI_SSID, strlen(WIFI_SSID), (uint8_t *)WIFI_PSK, strlen(WIFI_PSK));
 
 	while(1) {
 		if((platform_ticks() % 512) == 0)  {

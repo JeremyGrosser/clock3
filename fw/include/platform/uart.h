@@ -8,7 +8,7 @@
 
 typedef struct uart_s uart_t;
 
-void uart_init(uart_t *uart);
+int uart_init(uart_t *uart);
 void uart_putc(uart_t *uart, uint8_t c);
 uint8_t uart_getc(uart_t *uart);
 void uart_write(uart_t *uart, uint8_t *msg, size_t len);

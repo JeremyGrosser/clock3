@@ -18,7 +18,8 @@ SRCS += $(LOCAL_DIR)/platform.c \
 		$(LOCAL_DIR)/uart.c \
 		$(LOCAL_DIR)/stubs.c \
 		$(LOCAL_DIR)/rtc.c \
-		$(LOCAL_DIR)/sysclk.c
+		$(LOCAL_DIR)/sysclk.c \
+		$(LOCAL_DIR)/eic.c
 
 include $(CMSIS)/build.mk
 include $(CMSIS)/Device/ATMEL/SAMD21/build.mk

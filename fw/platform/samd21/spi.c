@@ -9,7 +9,7 @@ static uint8_t spi_baud(uint32_t baud) {
 	return (uint8_t)result;
 }
 
-void spi_setup(spi_t *spi) {
+int spi_setup(spi_t *spi) {
 	Sercom *sercom;
 
 	sercom = (Sercom *)(((void *)SERCOM0) + (spi->num * 0x400UL));
@@ -20,6 +20,7 @@ void spi_setup(spi_t *spi) {
 	gpio_setup(spi->sck);
 	gpio_setup(spi->nss);
 
+	gpio_write(spi->nss, 1);
 
 	GCLK->CLKCTRL.reg = (
 			GCLK_CLKCTRL_ID(GCLK_CLKCTRL_ID_SERCOM0_CORE_Val + spi->num) |
@@ -37,9 +38,20 @@ void spi_setup(spi_t *spi) {
 	// MSB first DORD=0
 	// No addressing FORM=0
 	spi->sercom->CTRLA.bit.MODE = 3;
-	spi->sercom->CTRLA.bit.DOPO = spi->mosi_pad;
 	spi->sercom->CTRLA.bit.DIPO = spi->miso_pad;
 	spi->sercom->CTRLA.bit.FORM = 0;
+
+	if(spi->mosi_pad == 0 && spi->sck_pad == 1) {
+		spi->sercom->CTRLA.bit.DOPO = 0;
+	}else if(spi->mosi_pad == 2 && spi->sck_pad == 3) {
+		spi->sercom->CTRLA.bit.DOPO = 1;
+	}else if(spi->mosi_pad == 3 && spi->sck_pad == 1) {
+		spi->sercom->CTRLA.bit.DOPO = 2;
+	}else if(spi->mosi_pad == 0 && spi->sck_pad == 3) {
+		spi->sercom->CTRLA.bit.DOPO = 3;
+	}else{
+		return -1;
+	}
 
 	// 8-bits per character CHSIZE=8
 	spi->sercom->CTRLB.reg = (
@@ -58,6 +70,8 @@ void spi_setup(spi_t *spi) {
 	spi->sercom->INTENSET.bit.RXC = 1;
 	spi->sercom->INTENSET.bit.DRE = 1;
 	//NVIC_EnableIRQ(SERCOM0_IRQn + spi->num);
+	
+	return 0;
 }
 
 void spi_begin(spi_t *spi) {

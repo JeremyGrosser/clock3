@@ -19,10 +19,10 @@ void gpio_setup(gpio_t *gpio) {
 	}
 
 	if(gpio->config.direction == DIR_OUT) {
-		PORT->Group[gpio->port].DIRSET.reg |= gpio->mask;
+		PORT->Group[gpio->port].DIR.reg |= gpio->mask;
 		PORT->Group[gpio->port].PINCFG[gpio->pin].bit.INEN = 0;
 	}else{
-		PORT->Group[gpio->port].DIRCLR.reg |= gpio->mask;
+		PORT->Group[gpio->port].DIR.reg &= ~gpio->mask;
 		PORT->Group[gpio->port].PINCFG[gpio->pin].bit.INEN = 1;
 	}
 
@@ -49,9 +49,9 @@ int gpio_read(gpio_t *gpio) {
 
 void gpio_write(gpio_t *gpio, int state) {
 	if(state == 0) {
-		PORT->Group[gpio->port].OUTCLR.reg |= gpio->mask;
+		PORT->Group[gpio->port].OUT.reg &= ~gpio->mask;
 	}else{
-		PORT->Group[gpio->port].OUTSET.reg |= gpio->mask;
+		PORT->Group[gpio->port].OUT.reg |= gpio->mask;
 	}
 }
 

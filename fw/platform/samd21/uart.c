@@ -9,7 +9,7 @@ uint16_t uart_baud(uint32_t baud) {
 	return (uint16_t)result;
 }
 
-void uart_init(uart_t *uart) {
+int uart_init(uart_t *uart) {
 	Sercom *sercom;
 
 	sercom = (Sercom *)(((void *)SERCOM0) + (uart->num * 0x400UL));
@@ -20,7 +20,7 @@ void uart_init(uart_t *uart) {
 
 	GCLK->CLKCTRL.reg = (
 			GCLK_CLKCTRL_ID(GCLK_CLKCTRL_ID_SERCOM0_CORE_Val + uart->num) |
-			GCLK_CLKCTRL_GEN(GCLK_GEN_MAIN) |
+			GCLK_CLKCTRL_GEN(GCLK_GEN_UART) |
 			GCLK_CLKCTRL_CLKEN);
 
 	// Enable the sercom clock
@@ -41,6 +41,14 @@ void uart_init(uart_t *uart) {
 			SERCOM_USART_CTRLA_SAMPR(2)
 			);
 
+	if(uart->tx_pad == 0) {
+		uart->sercom->CTRLA.bit.TXPO = 0;
+	}else if(uart->tx_pad == 2) {
+		uart->sercom->CTRLA.bit.TXPO = 1;
+	}else{
+		return -1;
+	}
+
 	uart->sercom->CTRLB.reg = (
 			SERCOM_USART_CTRLB_CHSIZE(8) |
 			SERCOM_USART_CTRLB_SBMODE |
@@ -54,6 +62,8 @@ void uart_init(uart_t *uart) {
 
 	uart->sercom->INTENSET.bit.RXC = 1;
 	uart->sercom->INTENSET.bit.TXC = 1;
+
+	return 0;
 }
 
 void uart_putc(uart_t *uart, uint8_t c) {

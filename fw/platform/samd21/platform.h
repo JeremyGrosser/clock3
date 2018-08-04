@@ -47,6 +47,22 @@ struct gpio_s {
     uint32_t mask;
 };
 
+struct eiccfg_s {
+	uint32_t num;
+	enum {
+		SENSE_NONE	= 0,
+		SENSE_RISE	= 1,
+		SENSE_FALL	= 2,
+		SENSE_BOTH	= 3,
+		SENSE_HIGH	= 4,
+		SENSE_LOW	= 5,
+	} sense;
+	enum {
+		FILTER_DISABLE	= 0,
+		FILTER_ENABLE	= 1,
+	} filter;
+};
+
 struct spi_s {
 	uint32_t num;
 

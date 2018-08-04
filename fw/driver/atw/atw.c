@@ -5,6 +5,9 @@
 
 #include <nm_bus_wrapper.h>
 #include <m2m_wifi.h>
+#include <m2m_types.h>
+
+#include <string.h>
 
 #define NM_BUS_MAX_TRX_SZ 256
 tstrNmBusCapabilities egstrNmBusCapabilities = {
@@ -42,7 +45,6 @@ int8_t nm_bus_init(void *initvalue) {
 	gpio_write(atw_g->gpio_rst, 1);
 	platform_delay(100);
 
-	spi_begin(atw_g->spi);
 	return 0;
 }
 
@@ -85,13 +87,32 @@ int atw_setup(atw_t *atw) {
 	atw_g = atw;
 
 	atw->irq_enabled = 0;
-	m2m_wifi_init(&param);
+	atw->irq_handler = NULL;
+	err = m2m_wifi_init(&param);
+	if(err != 0) {
+		return err;
+	}
 
 	return 0;
 }
 
+int atw_connect_wpa(atw_t *atw, uint8_t *ssid, size_t ssid_len, uint8_t *psk, size_t psk_len) {
+	tuniM2MWifiAuth auth;
+	int err;
+
+	if(psk_len > M2M_MAX_PSK_LEN) {
+		return -1;
+	}
+	memcpy(auth.au8PSK, psk, psk_len);
+	auth.au8PSK[psk_len] = '\0';
+
+	err = m2m_wifi_connect((char *)ssid, ssid_len, M2M_WIFI_SEC_WPA_PSK, (void *)&auth, M2M_WIFI_CH_ALL);
+
+	return err;
+}
+
 void atw_interrupt(atw_t *atw) {
-	if(atw->irq_enabled != 0) {
+	if(atw->irq_enabled != 0 && atw->irq_handler != NULL) {
 		atw->irq_handler();
 	}
 }
