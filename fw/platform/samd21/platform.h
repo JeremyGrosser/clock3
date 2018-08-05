@@ -9,6 +9,23 @@
 
 #include <stdint.h>
 
+struct exti_s {
+	uint32_t num;
+	exti_func_t function;
+	enum {
+		SENSE_NONE	= 0,
+		SENSE_RISE	= 1,
+		SENSE_FALL	= 2,
+		SENSE_BOTH	= 3,
+		SENSE_HIGH	= 4,
+		SENSE_LOW	= 5,
+	} sense;
+	enum {
+		FILTER_DISABLE	= 0,
+		FILTER_ENABLE	= 1,
+	} filter;
+};
+
 struct pincfg_s {
     enum {
         DIR_IN  = 0,
@@ -41,26 +58,11 @@ struct pincfg_s {
 struct gpio_s {
     uint32_t num;
     pincfg_t config;
+	exti_t interrupt;
 
     uint32_t port;
     uint32_t pin;
     uint32_t mask;
-};
-
-struct eiccfg_s {
-	uint32_t num;
-	enum {
-		SENSE_NONE	= 0,
-		SENSE_RISE	= 1,
-		SENSE_FALL	= 2,
-		SENSE_BOTH	= 3,
-		SENSE_HIGH	= 4,
-		SENSE_LOW	= 5,
-	} sense;
-	enum {
-		FILTER_DISABLE	= 0,
-		FILTER_ENABLE	= 1,
-	} filter;
 };
 
 struct spi_s {

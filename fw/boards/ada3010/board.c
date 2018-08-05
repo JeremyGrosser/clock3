@@ -3,12 +3,15 @@
 #include <platform/gpio.h>
 #include <platform/spi.h>
 #include <platform/uart.h>
-#include <platform/eic.h>
 #include <platform/rtc.h>
 #include <platform/i2c.h>
 #include <driver/atw.h>
 
 #include <stdio.h>
+
+void wifi_interrupt(void) {
+	atw_interrupt(&wifi);
+}
 
 gpio_t STATUS_LED = {
 	.num	= PIN_PA17,
@@ -49,12 +52,12 @@ gpio_t ATW_IRQ = {
 		.pmux			= PMUX_ENABLE,
 		.pmux_function	= MUX_PA21A_EIC_EXTINT5,
 	},
-};
-
-eiccfg_t ATW_IRQ_EXTI = {
-	.num	= 5,
-	.sense	= SENSE_RISE,
-	.filter	= FILTER_DISABLE,
+	.interrupt = {
+		.num	= 5,
+		.sense	= SENSE_RISE,
+		.filter	= FILTER_DISABLE,
+		.function = &wifi_interrupt,
+	},
 };
 
 gpio_t ATW_MOSI = {
@@ -159,10 +162,6 @@ i2c_t DISPLAY_I2C = {
 	.sda = &I2C_SDA,
 };
 
-void wifi_interrupt(void) {
-	atw_interrupt(&wifi);
-}
-
 void board_init() {
 	spi_t spi;
 	int err;
@@ -180,9 +179,6 @@ void board_init() {
 
 	rtc_init();
 	i2c_init(&DISPLAY_I2C);
-
-	eic_init();
-	eic_attach(&ATW_IRQ_EXTI, &wifi_interrupt);
 
 	spi.num		= 4;
 	spi.mosi	= &ATW_MOSI;

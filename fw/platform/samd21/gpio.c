@@ -1,5 +1,65 @@
 #include <platform/gpio.h>
+#include <platform.h>
 #include <board.h>
+#include "gclk.h"
+
+static exti_func_t exti_functions[EIC_EXTINT_NUM];
+static int exti_initialized = 0;
+
+static void exti_init(void) {
+	int i;
+	for(i = 0; i < EIC_EXTINT_NUM; i++) {
+		exti_functions[i] = NULL;
+	}
+
+	GCLK->CLKCTRL.reg = (
+			GCLK_CLKCTRL_ID(GCLK_CLKCTRL_ID_EIC) |
+			GCLK_CLKCTRL_GEN(GCLK_GEN_EIC) |
+			GCLK_CLKCTRL_CLKEN);
+
+	PM->APBAMASK.reg |= PM_APBAMASK_EIC;
+
+	EIC->CTRL.reg = EIC_CTRL_SWRST;
+	while(EIC->STATUS.bit.SYNCBUSY);
+
+	EIC->CTRL.reg = EIC_CTRL_ENABLE;
+	while(EIC->STATUS.bit.SYNCBUSY);
+
+	EIC->INTFLAG.reg = 0xFFFFFFFF;
+	NVIC_EnableIRQ(EIC_IRQn);
+	exti_initialized = 1;
+}
+
+static void exti_attach(exti_t *exti) {
+	int config_num, config_pos;
+	int flag;
+
+	if(exti_initialized == 0) {
+		exti_init();
+	}
+
+	flag = (1 << exti->num);
+	config_num = (exti->num / 8);
+	config_pos = ((exti->num % 8) * 4);
+
+	exti_functions[exti->num] = exti->function;
+	EIC->CONFIG[config_num].reg &= ~(0xF << config_pos);
+	EIC->CONFIG[config_num].reg |= ((exti->sense | (exti->filter << 3)) << config_pos);
+	EIC->INTENSET.reg |= flag;
+	EIC->WAKEUP.reg |= flag;
+}
+
+void EIC_Handler(void) {
+	uint32_t flag;
+	int i;
+
+	flag = EIC->INTFLAG.reg;
+	for(i = 0; i < EIC_EXTINT_NUM; i++) {
+		if(((flag >> i) & 1) && exti_functions[i] != NULL) {
+			exti_functions[i]();
+		}
+	}
+}
 
 void gpio_setup(gpio_t *gpio) {
 	gpio->port = (gpio->num / 32);
@@ -36,6 +96,10 @@ void gpio_setup(gpio_t *gpio) {
 		PORT->Group[gpio->port].PINCFG[gpio->pin].bit.DRVSTR = 1;
 	}else{
 		PORT->Group[gpio->port].PINCFG[gpio->pin].bit.DRVSTR = 0;
+	}
+
+	if(gpio->interrupt.function != NULL) {
+		exti_attach(&gpio->interrupt);
 	}
 }
 
