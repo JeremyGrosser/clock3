@@ -5,7 +5,7 @@
 #include <platform/uart.h>
 #include <platform/rtc.h>
 #include <platform/i2c.h>
-#include <driver/atw.h>
+#include <driver/atw/atw.h>
 
 #include <stdio.h>
 

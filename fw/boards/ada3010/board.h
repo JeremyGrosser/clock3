@@ -4,7 +4,7 @@
 #include <platform/gpio.h>
 #include <platform/i2c.h>
 #include <platform.h>
-#include <driver/atw.h>
+#include <driver/atw/atw.h>
 
 #include <stddef.h>
 

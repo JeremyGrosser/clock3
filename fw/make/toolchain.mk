@@ -4,7 +4,8 @@ LDFLAGS += --specs=nosys.specs --specs=nano.specs -Wl,-gc-sections,-Map=$(TARGET
 ifneq ($(LDSCRIPT),)
 	LDFLAGS := $(LDFLAGS),-T,$(LDSCRIPT)
 endif
-CFLAGS += -I$(TOPDIR)/include
+CFLAGS += -I$(TOPDIR)/include \
+		  -I$(TOPDIR)
 
 OBJS := $(SRCS:%.c=%.c.o)
 OBJS := $(OBJS:%.s=%.s.o)

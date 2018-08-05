@@ -1,7 +1,6 @@
 #include <platform/i2c.h>
 #include <platform.h>
-
-#include <driver/ht16k33.h>
+#include "ht16k33.h"
 
 #include <string.h>
 

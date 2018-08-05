@@ -1,7 +1,7 @@
 #include <platform/gpio.h>
 #include <platform/spi.h>
-#include <driver/atw.h>
 #include <platform.h>
+#include "atw.h"
 
 #include <nm_bus_wrapper.h>
 #include <m2m_wifi.h>

@@ -11,8 +11,8 @@
 #include <sys/time.h>
 #include <errno.h>
 
-#include <driver/ht16k33.h>
-#include <driver/atw.h>
+#include <driver/ht16k33/ht16k33.h>
+#include <driver/atw/atw.h>
 
 static const char *WIFI_SSID = "sierra24";
 static const char *WIFI_PSK = "whatevenisapassword";
