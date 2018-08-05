@@ -1,5 +1,6 @@
 #include <platform/gpio.h>
 #include <platform/i2c.h>
+#include <platform/rtc.h>
 #include <platform.h>
 #include <board.h>
 
@@ -16,9 +17,30 @@
 static const char *WIFI_SSID = "sierra24";
 static const char *WIFI_PSK = "whatevenisapassword";
 
+void display_time(ht16k33_t *display, struct tm *now) {
+	if(now->tm_hour > 0) {
+		ht16k33_set(display, ht16k33_column[0], ht16k33_digit[now->tm_hour / 10]);
+		ht16k33_set(display, ht16k33_column[1], ht16k33_digit[now->tm_hour % 10]);
+	}else{
+		ht16k33_set(display, ht16k33_column[0], ht16k33_digit[0]);
+		ht16k33_set(display, ht16k33_column[1], ht16k33_digit[0]);
+	}
+
+	if(now->tm_min > 0) {
+		ht16k33_set(display, ht16k33_column[2], ht16k33_digit[now->tm_min / 10]);
+		ht16k33_set(display, ht16k33_column[3], ht16k33_digit[now->tm_min % 10]);
+	}else{
+		ht16k33_set(display, ht16k33_column[2], ht16k33_digit[0]);
+		ht16k33_set(display, ht16k33_column[3], ht16k33_digit[0]);
+	}
+	ht16k33_set(display, ht16k33_column[4], ht16k33_colon);
+	ht16k33_flush(display);
+}
+
 int main(void) {
-	ht16k33_t display;
+	ht16k33_t display[2];
 	struct tm *now;
+	time_t epoch;
 	struct timeval tv;
 	char buf[128];
 	int i, err;
@@ -30,59 +52,41 @@ int main(void) {
 		printf("atw_connect_wpa failed\r\n");
 	}
 
-	while(1) {
-		atw_handle_events(&wifi);
-		if((platform_ticks() % 512) == 0)  {
-			gpio_toggle(&STATUS_LED);
-		}
-	}
-	/*
-	display.i2c = &DISPLAY_I2C;
-	display.i2c_addr = DISPLAY_ADDR;
+	display[0].i2c = &DISPLAY_I2C;
+	display[0].i2c_addr = 0x70;
 
-	do{
-		// Retry setup until morale improves
-		err = ht16k33_setup(&display);
-	}while(err != 0);
+	display[1].i2c = &DISPLAY_I2C;
+	display[1].i2c_addr = 0x73;
+
+	err = ht16k33_setup(&display[0]);
+	if(err != 0) {
+		printf("display 0 setup failed\r\n");
+	}
+	err = ht16k33_setup(&display[1]);
+	if(err != 0) {
+		printf("display 1 setup failed\r\n");
+	}
+
+	gpio_write(&STATUS_LED, LED_OFF);
 
 	while(1) {
 		err = gettimeofday(&tv, NULL);
 		if(err != 0) {
 			printf("gettimeofday failed: %s\r\n", strerror(errno));
 		}else{
-			strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", gmtime(&tv.tv_sec));
-			printf("%s\r\n", buf);
+			epoch = tv.tv_sec;
+			now = gmtime(&epoch);
+			display_time(&display[1], now);
 
-			now = rtc_read();
-			if(now->tm_hour > 0) {
-				ht16k33_set(&display, ht16k33_column[0], ht16k33_digit[now->tm_hour / 10]);
-				ht16k33_set(&display, ht16k33_column[1], ht16k33_digit[now->tm_hour % 10]);
-			}else{
-				ht16k33_set(&display, ht16k33_column[0], ht16k33_digit[0]);
-				ht16k33_set(&display, ht16k33_column[1], ht16k33_digit[0]);
-			}
-
-			if(now->tm_min > 0) {
-				ht16k33_set(&display, ht16k33_column[2], ht16k33_digit[now->tm_min / 10]);
-				ht16k33_set(&display, ht16k33_column[3], ht16k33_digit[now->tm_min % 10]);
-			}else{
-				ht16k33_set(&display, ht16k33_column[2], ht16k33_digit[0]);
-				ht16k33_set(&display, ht16k33_column[3], ht16k33_digit[0]);
-			}
-			ht16k33_set(&display, ht16k33_column[4], ht16k33_colon);
-			ht16k33_flush(&display);
+			epoch += (3600 * -8);
+			now = gmtime(&epoch);
+			display_time(&display[0], now);
 		}
+
+		atw_handle_events(&wifi);
+
 		__WFI();
 	}
-	*/
 
-	// rtc alarm interrupt every minute
-	// update clock display registers
-	// write new display values over I2C
-	//
-	// if hour==0 and minute==0
-	// 	wake wifi module
-	//	update rtc time from NTP or HTTPS
-	
 	return 0;
 }

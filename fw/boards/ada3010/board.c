@@ -4,6 +4,8 @@
 #include <platform/spi.h>
 #include <platform/uart.h>
 #include <platform/eic.h>
+#include <platform/rtc.h>
+#include <platform/i2c.h>
 #include <driver/atw.h>
 
 #include <stdio.h>
@@ -129,6 +131,34 @@ uart_t CONSOLE_UART = {
 	.rx_pad	= 3,
 };
 
+gpio_t I2C_SDA = {
+	.num	= PIN_PA22,
+	.config	= {
+		.direction	= DIR_OUT,
+		.drive		= DRIVE_LOW,
+		.pull		= PULL_ENABLE,
+		.pmux		= PMUX_ENABLE,
+		.pmux_function = MUX_PA22C_SERCOM3_PAD0,
+	},
+};
+
+gpio_t I2C_SCL = {
+	.num	= PIN_PA23,
+	.config	= {
+		.direction	= DIR_OUT,
+		.drive		= DRIVE_LOW,
+		.pull		= PULL_ENABLE,
+		.pmux		= PMUX_ENABLE,
+		.pmux_function = MUX_PA23C_SERCOM3_PAD1,
+	},
+};
+
+i2c_t DISPLAY_I2C = {
+	.num = 3,
+	.scl = &I2C_SCL,
+	.sda = &I2C_SDA,
+};
+
 void wifi_interrupt(void) {
 	atw_interrupt(&wifi);
 }
@@ -147,6 +177,9 @@ void board_init() {
 		while(1);
 	}
 	printf("\r\n\r\nada3010 board_init\r\n");
+
+	rtc_init();
+	i2c_init(&DISPLAY_I2C);
 
 	eic_init();
 	eic_attach(&ATW_IRQ_EXTI, &wifi_interrupt);

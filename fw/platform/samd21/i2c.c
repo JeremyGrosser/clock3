@@ -121,7 +121,9 @@ int i2c_start(i2c_t *i2c, uint8_t address) {
 int i2c_read(i2c_t *i2c, uint8_t address) {
 	int err;
 
-	err = i2c_start(i2c, address | 1);
+	address = (address << 1) | 1;
+
+	err = i2c_start(i2c, address);
 	if(err != 0) {
 		errno = EIO;
 		return -1;
@@ -135,7 +137,9 @@ int i2c_write(i2c_t *i2c, uint8_t address, uint8_t *data, size_t len) {
 	int err;
 	size_t i;
 
-	err = i2c_start(i2c, address & 0xFE);
+	address = (address << 1);
+
+	err = i2c_start(i2c, address);
 	if(err != 0) {
 		errno = EIO;
 		return -1;
