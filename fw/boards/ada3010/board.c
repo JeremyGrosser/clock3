@@ -5,13 +5,15 @@
 #include <platform/uart.h>
 #include <platform/rtc.h>
 #include <platform/i2c.h>
-#include <driver/atw/atw.h>
+//#include <driver/atw/atw.h>
 
 #include <stdio.h>
 
+/*
 void wifi_interrupt(void) {
 	atw_interrupt(&wifi);
 }
+*/
 
 gpio_t STATUS_LED = {
 	.num	= PIN_PA17,
@@ -52,12 +54,14 @@ gpio_t ATW_IRQ = {
 		.pmux			= PMUX_ENABLE,
 		.pmux_function	= MUX_PA21A_EIC_EXTINT5,
 	},
+	/*
 	.interrupt = {
 		.num	= 5,
 		.sense	= SENSE_RISE,
 		.filter	= FILTER_DISABLE,
 		.function = &wifi_interrupt,
 	},
+	*/
 };
 
 gpio_t ATW_MOSI = {
@@ -194,12 +198,14 @@ void board_init() {
 		while(1);
 	}
 
+	/*
 	wifi.spi			= &spi;
 	wifi.gpio_rst		= &ATW_RST;
 	wifi.gpio_irq		= &ATW_IRQ;
 	wifi.gpio_chip_en	= &ATW_CHIP_EN;
 
 	atw_setup(&wifi);
+	*/
 }
 
 void console_write(uint8_t *msg, size_t len) {

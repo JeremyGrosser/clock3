@@ -11,8 +11,6 @@ static int ht16k33_writereg(ht16k33_t *dev, uint8_t reg, uint8_t value) {
 
 int ht16k33_setup(ht16k33_t *dev) {
 	int err;
-	int i, j;
-	uint8_t data[17];
 
 	// Enable system oscillator
 	err = ht16k33_writereg(dev, HT16K33_REG_SYS, HT16K33_SYS_ENABLE);
@@ -26,8 +24,13 @@ int ht16k33_setup(ht16k33_t *dev) {
 		return err;
 	}
 
-	memset(dev->state, 0x00, (sizeof(dev->state) / sizeof(uint8_t)));
+	// Set brightness
+	err = ht16k33_writereg(dev, HT16K33_REG_DIMMING, (dev->brightness & 0x0F));
+	if(err != 0) {
+		return err;
+	}
 
+	memset(dev->state, 0x00, sizeof(dev->state));
 	err = ht16k33_flush(dev);
 
 	return err;
@@ -40,12 +43,18 @@ void ht16k33_set(ht16k33_t *dev, uint8_t column, uint8_t row) {
 int ht16k33_flush(ht16k33_t *dev) {
 	uint8_t data[17];
 	int err;
-	int i;
 
-	data[0] = 0x00;
-	for(i = 0; i < 16; i++) {
-		data[i+1] = dev->state[i];
+	// The first byte sent is the write command (0x00), followed by 16 bytes of
+	// data to load into Display RAM
+	
+	// This should never happen, but let's just check the bounds to be sure
+	if(sizeof(dev->state) > (sizeof(data) - 1)) {
+		return 1;
 	}
-	err = i2c_write(dev->i2c, dev->i2c_addr, data, 17);
+
+	memset(data, 0x00, sizeof(data));
+	memcpy(data + 1, dev->state, sizeof(dev->state));
+
+	err = i2c_write(dev->i2c, dev->i2c_addr, data, sizeof(data));
 	return err;
 }
