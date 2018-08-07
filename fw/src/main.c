@@ -14,6 +14,40 @@
 #include <driver/ht16k33/ht16k33.h>
 //#include <driver/atw/atw.h>
 
+#define CONSOLE_MAXLEN 128
+uint8_t console_buf[CONSOLE_MAXLEN] = {0};
+uint8_t *console_ptr = console_buf;
+size_t console_avail = CONSOLE_MAXLEN;
+
+void process_command(uint8_t *line, size_t len) {
+	printf("command[%d]: %s\r\n", len, line);
+}
+
+static void console_loop(void) {
+	uint8_t *eol;
+	int err;
+
+	err = console_read(console_ptr, console_avail);
+	if(err <= 0) {
+		return;
+	}
+
+	console_ptr += err;
+	console_avail -= err;
+
+	eol = (uint8_t *)memchr(console_buf, '\n', CONSOLE_MAXLEN);
+	if(eol != NULL) {
+		process_command(console_buf, (eol - console_buf));
+		memset(console_buf, 0x00, CONSOLE_MAXLEN);
+		console_ptr = console_buf;
+		console_avail = CONSOLE_MAXLEN;
+	}else if(console_avail == 0) {
+		printf("console buffer overflow!\r\n\r\n");
+		memset(console_buf, 0x00, CONSOLE_MAXLEN);
+		console_ptr = console_buf;
+		console_avail = CONSOLE_MAXLEN;
+	}
+}
 
 void display_time(ht16k33_t *display, struct tm *now) {
 	if(now->tm_hour > 0) {
@@ -54,11 +88,11 @@ int main(void) {
 
 	display[0].i2c = &DISPLAY_I2C;
 	display[0].i2c_addr = 0x70;
-	display[0].brightness = 1;
+	display[0].brightness = 2;
 
 	display[1].i2c = &DISPLAY_I2C;
 	display[1].i2c_addr = 0x73;
-	display[1].brightness = 1;
+	display[1].brightness = 2;
 
 	err = ht16k33_setup(&display[0]);
 	if(err != 0) {
@@ -86,6 +120,7 @@ int main(void) {
 		}
 
 		//atw_handle_events(&wifi);
+		console_loop();
 
 		__WFI();
 	}

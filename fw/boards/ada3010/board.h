@@ -19,5 +19,6 @@ i2c_t DISPLAY_I2C;
 
 void board_init();
 void console_write(uint8_t *msg, size_t len);
+int console_read(uint8_t *msg, size_t maxlen);
 
 #endif

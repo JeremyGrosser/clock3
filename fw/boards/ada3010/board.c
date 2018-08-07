@@ -2,9 +2,9 @@
 #include <platform.h>
 #include <platform/gpio.h>
 #include <platform/spi.h>
-#include <platform/uart.h>
 #include <platform/rtc.h>
 #include <platform/i2c.h>
+//#include <platform/uart.h>
 //#include <driver/atw/atw.h>
 
 #include <stdio.h>
@@ -107,11 +107,12 @@ gpio_t ATW_CHIP_EN = {
 	},
 };
 
+/*
 gpio_t CONSOLE_TXD = {
 	.num	= PIN_PA10,
 	.config = {
 		.direction		= DIR_OUT,
-		.drive			= DRIVE_LOW,
+		.drive			= DRIVE_HIGH,
 		.pull			= PULL_ENABLE,
 		.pmux			= PMUX_ENABLE,
 		.pmux_function	= MUX_PA10C_SERCOM0_PAD2,
@@ -122,7 +123,7 @@ gpio_t CONSOLE_RXD = {
 	.num	= PIN_PA11,
 	.config = {
 		.direction		= DIR_IN,
-		.drive			= DRIVE_LOW,
+		.drive			= DRIVE_HIGH,
 		.pull			= PULL_ENABLE,
 		.pmux			= PMUX_ENABLE,
 		.pmux_function	= MUX_PA11C_SERCOM0_PAD3,
@@ -137,6 +138,7 @@ uart_t CONSOLE_UART = {
 	.tx_pad = 2,
 	.rx_pad	= 3,
 };
+*/
 
 gpio_t I2C_SDA = {
 	.num	= PIN_PA22,
@@ -175,10 +177,13 @@ void board_init() {
 	gpio_setup(&STATUS_LED);
 	gpio_write(&STATUS_LED, LED_ON);
 
+	/*
 	err = uart_init(&CONSOLE_UART);
 	if(err != 0) {
 		while(1);
 	}
+	*/
+	printf("\033[2J\033[0;0H");
 	printf("\r\n\r\nada3010 board_init\r\n");
 
 	rtc_init();
@@ -198,6 +203,9 @@ void board_init() {
 		while(1);
 	}
 
+	gpio_setup(&ATW_CHIP_EN);
+	gpio_write(&ATW_CHIP_EN, 0);
+
 	/*
 	wifi.spi			= &spi;
 	wifi.gpio_rst		= &ATW_RST;
@@ -209,7 +217,12 @@ void board_init() {
 }
 
 void console_write(uint8_t *msg, size_t len) {
-	uart_write(&CONSOLE_UART, msg, len);
+	//uart_write(&CONSOLE_UART, msg, len);
+}
+
+int console_read(uint8_t *msg, size_t maxlen) {
+	//return uart_read(&CONSOLE_UART, msg, maxlen);
+	return -1;
 }
 
 void SERCOM4_Handler() {

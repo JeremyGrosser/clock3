@@ -65,11 +65,9 @@ void SystemInit(void)
 	// Keep the default device state after reset
 	SystemCoreClock = __SYSTEM_CLOCK;
 
-	/*
 	SYSCTRL->OSC8M.bit.PRESC = SYSCTRL_OSC8M_PRESC_0_Val;
 	while(!SYSCTRL->PCLKSR.bit.OSC8MRDY);
 	SystemCoreClock = 8000000;
-	*/
 	return;
 }
 

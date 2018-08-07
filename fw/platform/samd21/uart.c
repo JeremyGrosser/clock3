@@ -49,6 +49,8 @@ int uart_init(uart_t *uart) {
 		return -1;
 	}
 
+	uart->sercom->DBGCTRL.reg = 0;
+
 	uart->sercom->CTRLB.reg = (
 			SERCOM_USART_CTRLB_CHSIZE(8) |
 			SERCOM_USART_CTRLB_SBMODE |
@@ -62,6 +64,8 @@ int uart_init(uart_t *uart) {
 
 	uart->sercom->INTENSET.bit.RXC = 1;
 	uart->sercom->INTENSET.bit.TXC = 1;
+
+	//NVIC_EnableIRQ(SERCOM0_IRQn + uart->num);
 
 	return 0;
 }
@@ -88,12 +92,17 @@ void uart_write(uart_t *uart, uint8_t *msg, size_t len) {
 	}
 }
 
-void uart_read(uart_t *uart, uint8_t *msg, size_t len) {
+int uart_read(uart_t *uart, uint8_t *msg, size_t len) {
+	uint8_t c;
 	size_t i;
+
 	for(i = 0; i < len; i++) {
-		msg[i] = uart_getc(uart);
-		if(msg[i] == 0) {
-			i--;
+		c = uart_getc(uart);
+		if(c <= 0) {
+			break;
 		}
+		msg[i] = c;
 	}
+
+	return i;
 }

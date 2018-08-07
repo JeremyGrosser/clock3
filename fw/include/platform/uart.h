@@ -12,6 +12,6 @@ int uart_init(uart_t *uart);
 void uart_putc(uart_t *uart, uint8_t c);
 uint8_t uart_getc(uart_t *uart);
 void uart_write(uart_t *uart, uint8_t *msg, size_t len);
-void uart_read(uart_t *uart, uint8_t *msg, size_t len); // maybe add int flags
+int uart_read(uart_t *uart, uint8_t *msg, size_t len); // maybe add int flags
 
 #endif
