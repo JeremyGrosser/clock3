@@ -12,7 +12,10 @@
 #include <errno.h>
 
 #include <driver/ht16k33/ht16k33.h>
-//#include <driver/atw/atw.h>
+#include <driver/atw/atw.h>
+
+#define WIFI_SSID "sierra24"
+#define WIFI_PSK "whatevenisapassword"
 
 #define CONSOLE_MAXLEN 128
 uint8_t console_buf[CONSOLE_MAXLEN] = {0};
@@ -49,6 +52,23 @@ static void console_loop(void) {
 	}
 }
 
+void button0_interrupt(void) {
+	struct tm *now;
+
+	now = rtc_read();
+	now->tm_min = ((now->tm_min + 1) % 60);
+	now->tm_sec = 0;
+	rtc_write(now);
+}
+
+void button1_interrupt(void) {
+	struct tm *now;
+
+	now = rtc_read();
+	now->tm_hour = ((now->tm_hour + 1) % 24);
+	rtc_write(now);
+}
+
 void display_time(ht16k33_t *display, struct tm *now) {
 	if(now->tm_hour > 0) {
 		ht16k33_set(display, ht16k33_column[0], ht16k33_digit[now->tm_hour / 10]);
@@ -71,13 +91,16 @@ void display_time(ht16k33_t *display, struct tm *now) {
 }
 
 int main(void) {
-	ht16k33_t display[2];
+	ht16k33_t display[3];
 	struct tm *now;
 	time_t epoch;
 	struct timeval tv;
 	int err;
 
-	board_init();
+	err = board_init();
+	if(err != 0) {
+		printf("board_init err=%d\r\n", err);
+	}
 
 	/*
 	err = atw_connect_wpa(&wifi, (uint8_t *)WIFI_SSID, strlen(WIFI_SSID), (uint8_t *)WIFI_PSK, strlen(WIFI_PSK));
@@ -88,11 +111,15 @@ int main(void) {
 
 	display[0].i2c = &DISPLAY_I2C;
 	display[0].i2c_addr = 0x70;
-	display[0].brightness = 2;
+	display[0].brightness = 8;
 
 	display[1].i2c = &DISPLAY_I2C;
 	display[1].i2c_addr = 0x73;
-	display[1].brightness = 2;
+	display[1].brightness = 8;
+
+	display[2].i2c = &DISPLAY_I2C;
+	display[2].i2c_addr = 0x71;
+	display[2].brightness = 8;
 
 	err = ht16k33_setup(&display[0]);
 	if(err != 0) {
@@ -102,6 +129,10 @@ int main(void) {
 	if(err != 0) {
 		printf("display 1 setup failed\r\n");
 	}
+	err = ht16k33_setup(&display[2]);
+	if(err != 0) {
+		printf("display 2 setup failed\r\n");
+	}
 
 	gpio_write(&STATUS_LED, LED_OFF);
 
@@ -110,19 +141,25 @@ int main(void) {
 		if(err != 0) {
 			printf("gettimeofday failed: %s\r\n", strerror(errno));
 		}else{
-			epoch = tv.tv_sec;
+			epoch = tv.tv_sec + (3600 * -7);
+			now = gmtime(&epoch);
+			display_time(&display[0], now);
+
+			epoch = tv.tv_sec + (3600 * -4);
 			now = gmtime(&epoch);
 			display_time(&display[1], now);
 
-			epoch += (3600 * -8);
+			epoch = tv.tv_sec;
 			now = gmtime(&epoch);
-			display_time(&display[0], now);
+			display_time(&display[2], now);
 		}
 
 		//atw_handle_events(&wifi);
 		console_loop();
 
+		gpio_write(&STATUS_LED, LED_OFF);
 		__WFI();
+		gpio_write(&STATUS_LED, LED_ON);
 	}
 
 	return 0;
