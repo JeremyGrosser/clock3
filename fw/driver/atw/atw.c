@@ -112,7 +112,8 @@ int atw_connect_wpa(atw_t *atw, uint8_t *ssid, size_t ssid_len, uint8_t *psk, si
 	memcpy(auth.au8PSK, psk, psk_len);
 	auth.au8PSK[psk_len] = '\0';
 
-	err = m2m_wifi_connect((char *)ssid, ssid_len, M2M_WIFI_SEC_WPA_PSK, (void *)&auth, M2M_WIFI_CH_ALL);
+	//err = m2m_wifi_connect((char *)ssid, ssid_len, M2M_WIFI_SEC_WPA_PSK, (void *)&auth, M2M_WIFI_CH_ALL);
+	err = m2m_wifi_default_connect();
 
 	return err;
 }

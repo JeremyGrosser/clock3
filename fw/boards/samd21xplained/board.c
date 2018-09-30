@@ -71,7 +71,7 @@ i2c_t DISPLAY_I2C = {
 	.sda	= &I2C_SDA,
 };
 
-void board_init() {
+int board_init() {
 	platform_init();
 	uart_init(&CONSOLE_UART);
 
@@ -84,6 +84,8 @@ void board_init() {
 
 	//gpio_setup(&STATUS_LED);
 	//gpio_write(&STATUS_LED, LED_ON);
+	
+	return 0;
 }
 
 void console_write(uint8_t *msg, size_t len) {

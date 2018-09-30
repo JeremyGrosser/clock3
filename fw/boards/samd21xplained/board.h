@@ -18,7 +18,7 @@ extern gpio_t CONSOLE_RXD;
 extern uart_t CONSOLE_UART;
 extern i2c_t DISPLAY_I2C;
 
-void board_init();
+int board_init();
 void console_write(uint8_t *msg, size_t len);
 
 #endif

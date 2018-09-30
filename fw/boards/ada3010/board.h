@@ -14,11 +14,15 @@
 #define DISPLAY_ADDR 0x70
 
 gpio_t STATUS_LED;
+gpio_t BUTTON0, BUTTON1;
 atw_t wifi;
 i2c_t DISPLAY_I2C;
 
-void board_init();
+int board_init();
 void console_write(uint8_t *msg, size_t len);
 int console_read(uint8_t *msg, size_t maxlen);
+
+void button0_interrupt(void);
+void button1_interrupt(void);
 
 #endif

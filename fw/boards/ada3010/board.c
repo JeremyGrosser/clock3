@@ -9,11 +9,9 @@
 
 #include <stdio.h>
 
-/*
 void wifi_interrupt(void) {
 	atw_interrupt(&wifi);
 }
-*/
 
 gpio_t STATUS_LED = {
 	.num	= PIN_PA17,
@@ -22,6 +20,38 @@ gpio_t STATUS_LED = {
 		.drive		= DRIVE_HIGH,
 		.pull		= PULL_ENABLE,
 		.pmux		= PMUX_DISABLE,
+	},
+};
+
+gpio_t BUTTON0 = {
+	.num	= PIN_PA02,
+	.config	= {
+		.direction	= DIR_IN,
+		.pull		= PULL_ENABLE,
+		.pmux		= PMUX_ENABLE,
+		.pmux_function = MUX_PA02A_EIC_EXTINT2,
+	},
+	.interrupt = {
+		.num	= 2,
+		.sense	= SENSE_RISE,
+		.filter	= FILTER_ENABLE,
+		.function = &button0_interrupt,
+	},
+};
+
+gpio_t BUTTON1 = {
+	.num	= PIN_PB08,
+	.config	= {
+		.direction	= DIR_IN,
+		.pull		= PULL_ENABLE,
+		.pmux		= PMUX_ENABLE,
+		.pmux_function = MUX_PB08A_EIC_EXTINT8,
+	},
+	.interrupt = {
+		.num	= 8,
+		.sense	= SENSE_RISE,
+		.filter	= FILTER_ENABLE,
+		.function = &button1_interrupt,
 	},
 };
 
@@ -50,18 +80,16 @@ gpio_t ATW_IRQ = {
 	.config	= {
 		.direction		= DIR_IN,
 		.drive			= DRIVE_LOW,
-		.pull			= PULL_DISABLE,
+		.pull			= PULL_ENABLE,
 		.pmux			= PMUX_ENABLE,
 		.pmux_function	= MUX_PA21A_EIC_EXTINT5,
 	},
-	/*
 	.interrupt = {
 		.num	= 5,
 		.sense	= SENSE_RISE,
 		.filter	= FILTER_DISABLE,
 		.function = &wifi_interrupt,
 	},
-	*/
 };
 
 gpio_t ATW_MOSI = {
@@ -168,7 +196,7 @@ i2c_t DISPLAY_I2C = {
 	.sda = &I2C_SDA,
 };
 
-void board_init() {
+int board_init() {
 	spi_t spi;
 	int err;
 
@@ -180,7 +208,7 @@ void board_init() {
 	/*
 	err = uart_init(&CONSOLE_UART);
 	if(err != 0) {
-		while(1);
+		return err;
 	}
 	*/
 	printf("\033[2J\033[0;0H");
@@ -188,6 +216,11 @@ void board_init() {
 
 	rtc_init();
 	i2c_init(&DISPLAY_I2C);
+
+	gpio_setup(&BUTTON0);
+	gpio_setup(&BUTTON1);
+	gpio_write(&BUTTON0, 0);
+	gpio_write(&BUTTON1, 0);
 
 	spi.num		= 4;
 	spi.mosi	= &ATW_MOSI;
@@ -200,20 +233,25 @@ void board_init() {
 
 	err = spi_setup(&spi);
 	if(err != 0) {
-		while(1);
+		return err;
 	}
 
 	gpio_setup(&ATW_CHIP_EN);
 	gpio_write(&ATW_CHIP_EN, 0);
 
-	/*
 	wifi.spi			= &spi;
 	wifi.gpio_rst		= &ATW_RST;
 	wifi.gpio_irq		= &ATW_IRQ;
 	wifi.gpio_chip_en	= &ATW_CHIP_EN;
 
-	atw_setup(&wifi);
+	/*
+	err = atw_setup(&wifi);
+	if(err != 0) {
+		return err;
+	}
 	*/
+
+	return 0;
 }
 
 void console_write(uint8_t *msg, size_t len) {

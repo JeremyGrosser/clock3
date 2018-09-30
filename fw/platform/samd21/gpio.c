@@ -54,6 +54,7 @@ void EIC_Handler(void) {
 	int i;
 
 	flag = EIC->INTFLAG.reg;
+	EIC->INTFLAG.reg = 0xFFFFFFFF;
 	for(i = 0; i < EIC_EXTINT_NUM; i++) {
 		if(((flag >> i) & 1) && exti_functions[i] != NULL) {
 			exti_functions[i]();

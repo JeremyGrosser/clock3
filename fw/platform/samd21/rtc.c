@@ -18,7 +18,7 @@ static struct tm rtc_now = {
 
 // Track the value of platform_ticks() as of the last RTC read and use that to
 // calculate seconds
-static uint32_t rtc_ticks = 1000;
+//static uint32_t rtc_ticks = 1000;
 
 void rtc_init(void) {
 	RtcMode2 *hw = &RTC->MODE2;
@@ -99,7 +99,6 @@ void rtc_init(void) {
 }
 
 struct tm *rtc_read(void) {
-	/*
 	RtcMode2 *hw = &RTC->MODE2;
 
 	hw->READREQ.reg = RTC_READREQ_RREQ;
@@ -112,13 +111,13 @@ struct tm *rtc_read(void) {
 	rtc_now.tm_min = hw->CLOCK.bit.MINUTE;
 	rtc_now.tm_sec = hw->CLOCK.bit.SECOND;
 	rtc_now.tm_isdst = -1;
-	*/
 
 	if(rtc_now.tm_mon < 0) {
 		return NULL;
 	}
 
-	rtc_now.tm_sec = (platform_ticks() - rtc_ticks) / 1000;
+	//rtc_now.tm_sec = (platform_ticks() - rtc_ticks) / 1000;
+	rtc_now.tm_sec = 0;
 	if(rtc_now.tm_sec > 65) {
 		// For some reason, the RTC interrupt hasn't fired in the last minute,
 		// so don't return incorrect time data
@@ -139,11 +138,13 @@ void rtc_write(struct tm *now) {
 			RTC_MODE2_CLOCK_MINUTE(now->tm_min) |
 			RTC_MODE2_CLOCK_SECOND(now->tm_sec));
 	while(hw->STATUS.bit.SYNCBUSY);
+	//rtc_ticks = platform_ticks();
 }
 
 void RTC_Handler(void) {
 	RtcMode2 *hw = &RTC->MODE2;
 
+	/*
 	hw->READREQ.reg = RTC_READREQ_RREQ;
 	while(hw->STATUS.bit.SYNCBUSY);
 
@@ -156,6 +157,7 @@ void RTC_Handler(void) {
 	rtc_now.tm_min = hw->CLOCK.bit.MINUTE;
 	rtc_now.tm_sec = hw->CLOCK.bit.SECOND;
 	rtc_now.tm_isdst = 0;
+	*/
 
 	hw->INTFLAG.reg = 0xFF;
 }
