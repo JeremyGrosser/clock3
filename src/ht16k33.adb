@@ -1,38 +1,33 @@
 package body HT16K33 is
-   procedure Enable
+   procedure Initialize
       (This : in out Device)
    is
-      Oscillator_On : constant UInt8_Array (1 .. 1) := (1 => 2#0010_0001#);
-      Display_On    : constant UInt8_Array (1 .. 1) := (1 => 2#1000_0001#);
+      Oscillator_On : constant UInt8 := 16#21#;
    begin
       I2C_Write (This.Address, Oscillator_On);
-      I2C_Write (This.Address, Display_On);
-   end Enable;
+      Fill (This, High);
+   end Initialize;
 
-   procedure Disable
-      (This : in out Device)
+   procedure Set_Brightness
+      (This  : in out Device;
+       Level : Brightness_Level)
    is
-      Display_Off : constant UInt8_Array (1 .. 1) := (1 => 2#10000000#);
    begin
-      I2C_Write (This.Address, Display_Off);
-   end Disable;
+      I2C_Write (This.Address, 16#E0# or Level);
+   end Set_Brightness;
 
-   procedure Write_Display
-      (This : in out Device;
-       Data : Display_Data)
+   procedure Fill
+      (This  : in out Device;
+       State : Output_State)
    is
-      Set_Address : constant UInt8 := 0; -- display pointer := 0
-      D           : constant UInt8_Array := Set_Address & Data;
    begin
-      I2C_Write (This.Address, D);
-   end Write_Display;
-
-   procedure Set_PWM
-      (This : in out Device;
-       DC   : Duty_Cycle)
-   is
-      D : constant UInt8_Array (1 .. 1) := (1 => 2#1110_0000# or DC);
-   begin
-      I2C_Write (This.Address, D);
-   end Set_PWM;
+      for I in 1 .. This.Buffer'Last loop
+         if State = High then
+            This.Buffer (I) := 16#FF#;
+         else
+            This.Buffer (I) := 16#00#;
+         end if;
+      end loop;
+      I2C_Write (This.Address, This.Buffer);
+   end Fill;
 end HT16K33;

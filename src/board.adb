@@ -444,6 +444,15 @@ package body Board is
       SERCOM5_Periph.SERCOM_I2CM.CTRLB.CMD := 3;
    end I2C_Write;
 
+   procedure I2C_Write
+      (Address : I2C_Address;
+       Data    : UInt8)
+   is
+      D : constant UInt8_Array (1 .. 1) := (1 => Data);
+   begin
+      I2C_Write (Address, D);
+   end I2C_Write;
+
    procedure I2C_Read
       (Address : I2C_Address;
        Data    : out UInt8_Array)
@@ -457,6 +466,16 @@ package body Board is
          Data (I) := SERCOM5_Periph.SERCOM_I2CM.DATA;
       end loop;
       SERCOM5_Periph.SERCOM_I2CM.CTRLB.CMD := 3;
+   end I2C_Read;
+
+   function I2C_Read
+      (Address : I2C_Address)
+      return UInt8
+   is
+      D : UInt8_Array (1 .. 1);
+   begin
+      I2C_Read (Address, D);
+      return D (1);
    end I2C_Read;
 
    function Unique_Id

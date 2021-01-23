@@ -2,21 +2,28 @@ with Board; use Board;
 with HAL; use HAL;
 
 package HT16K33 is
-   type Device is record
-      Address : I2C_Address := 2#1110000#;
+   type Device (Address : I2C_Address) is tagged private;
+
+   Default_Address : constant I2C_Address := 16#70#;
+
+   subtype Brightness_Level is UInt8 range 0 .. 15;
+   type Output_State is (High, Low);
+
+   procedure Initialize
+      (This : in out Device);
+
+   procedure Fill
+      (This  : in out Device;
+       State : Output_State);
+
+   procedure Set_Brightness
+      (This  : in out Device;
+       Level : Brightness_Level);
+
+private
+
+   type Device (Address : I2C_Address) is tagged record
+      Buffer     : UInt8_Array (0 .. 16) := (others => 0); -- byte zero is the address set command, the remaining 16 bytes are output values
+      Brightness : Brightness_Level := Brightness_Level'Last;
    end record;
-
-   subtype Display_Data is UInt8_Array (0 .. 15);
-   subtype Duty_Cycle is UInt8 range 0 .. 15;
-
-   procedure Enable
-      (This : in out Device);
-   procedure Disable
-      (This : in out Device);
-   procedure Write_Display
-      (This : in out Device;
-       Data : Display_Data);
-   procedure Set_PWM
-      (This : in out Device;
-       DC   : Duty_Cycle);
 end HT16K33;
