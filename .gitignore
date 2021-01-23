@@ -5,4 +5,5 @@ fw/build/
 *.bin
 *.lst
 *.swp
+obj
 *bak
