@@ -58,20 +58,6 @@ package Board is
        (Data : in out HAL.UInt8);
     procedure SPI_End;
 
-    subtype I2C_Address is HAL.UInt7;
-    function I2C_Read
-       (Address : I2C_Address)
-       return HAL.UInt8;
-    procedure I2C_Read
-       (Address : I2C_Address;
-        Data    : out HAL.UInt8_Array);
-    procedure I2C_Write
-       (Address : I2C_Address;
-        Data    : HAL.UInt8);
-    procedure I2C_Write
-       (Address : I2C_Address;
-        Data    : HAL.UInt8_Array);
-
     subtype Unique_Id_Type is HAL.UInt32_Array (1 .. 4);
     function Unique_Id
        return Unique_Id_Type;

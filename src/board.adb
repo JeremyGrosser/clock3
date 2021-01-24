@@ -301,30 +301,7 @@ package body Board is
       while GCLK_Periph.STATUS.SYNCBUSY loop
          null;
       end loop;
-
       PM_Periph.APBCMASK.SERCOM5 := True;
-      SERCOM5_Periph.SERCOM_I2CM.CTRLA.SWRST := True;
-      while SERCOM5_Periph.SERCOM_I2CM.SYNCBUSY.SWRST loop
-         null;
-      end loop;
-      SERCOM5_Periph.SERCOM_I2CM.CTRLA :=
-         (MODE    => I2C_MASTER,
-          SPEED   => 0,
-          PINOUT  => False,
-          SDAHOLD => 0,
-          SCLSM   => False,
-          others => <>);
-      SERCOM5_Periph.SERCOM_I2CM.CTRLB :=
-         (SMEN   => True,
-          others => <>);
-      SERCOM5_Periph.SERCOM_I2CM.BAUD :=
-         (BAUDLOW => 58,
-          BAUD    => 24,
-          others  => <>);
-      SERCOM5_Periph.SERCOM_I2CM.CTRLA.ENABLE := True;
-      while SERCOM5_Periph.SERCOM_I2CM.SYNCBUSY.ENABLE loop
-         null;
-      end loop;
 
       -- Enable external interrupts
       GCLK_Periph.CLKCTRL :=
@@ -428,55 +405,6 @@ package body Board is
       --Digital_Write (NSS, High);
       null;
    end SPI_End;
-
-   procedure I2C_Write
-      (Address : I2C_Address;
-       Data    : UInt8_Array)
-   is
-   begin
-      SERCOM5_Periph.SERCOM_I2CM.ADDR.ADDR := UInt11 (Shift_Left (UInt8 (Address), 1));
-      while not SERCOM5_Periph.SERCOM_I2CM.INTFLAG.MB loop
-         null;
-      end loop;
-      for D of Data loop
-         SERCOM5_Periph.SERCOM_I2CM.DATA := D;
-      end loop;
-      SERCOM5_Periph.SERCOM_I2CM.CTRLB.CMD := 3;
-   end I2C_Write;
-
-   procedure I2C_Write
-      (Address : I2C_Address;
-       Data    : UInt8)
-   is
-      D : constant UInt8_Array (1 .. 1) := (1 => Data);
-   begin
-      I2C_Write (Address, D);
-   end I2C_Write;
-
-   procedure I2C_Read
-      (Address : I2C_Address;
-       Data    : out UInt8_Array)
-   is
-   begin
-      SERCOM5_Periph.SERCOM_I2CM.ADDR.ADDR := UInt11 (Shift_Left (UInt8 (Address), 1) or 1);
-      while not SERCOM5_Periph.SERCOM_I2CM.INTFLAG.MB loop
-         null;
-      end loop;
-      for I in Data'Range loop
-         Data (I) := SERCOM5_Periph.SERCOM_I2CM.DATA;
-      end loop;
-      SERCOM5_Periph.SERCOM_I2CM.CTRLB.CMD := 3;
-   end I2C_Read;
-
-   function I2C_Read
-      (Address : I2C_Address)
-      return UInt8
-   is
-      D : UInt8_Array (1 .. 1);
-   begin
-      I2C_Read (Address, D);
-      return D (1);
-   end I2C_Read;
 
    function Unique_Id
       return Unique_Id_Type
