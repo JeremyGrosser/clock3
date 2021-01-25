@@ -54,10 +54,13 @@ package body SAMD21.I2C is
    is
    begin
       -- Setup
-      if This.Periph.SERCOM_I2CM.STATUS.BUSSTATE /= 1 then
+      This.Periph.SERCOM_I2CM.Status.BUSSTATE := 1;
+      while This.Periph.SERCOM_I2CM.STATUS.BUSSTATE /= 1 loop
          Status := Err_Error;
          return;
-      end if;
+      end loop;
+
+      This.Periph.SERCOM_I2CM.CTRLB.ACKACT := False;
 
       -- Send address
       This.Periph.SERCOM_I2CM.ADDR.ADDR := SERCOM_ADDR_SERCOM_I2CM_ADDR_Field (Shift_Left (UInt16 (Addr), 1));
@@ -114,7 +117,54 @@ package body SAMD21.I2C is
       Timeout : Natural := 1000)
    is
    begin
-      Status := Err_Error;
+      -- Setup
+      if This.Periph.SERCOM_I2CM.STATUS.BUSSTATE /= 1 then
+         Status := Err_Error;
+         return;
+      end if;
+
+      This.Periph.SERCOM_I2CM.CTRLB.ACKACT := False;
+
+      -- Send address
+      This.Periph.SERCOM_I2CM.ADDR.ADDR := SERCOM_ADDR_SERCOM_I2CM_ADDR_Field (Shift_Left (UInt16 (Addr), 1) or 1);
+      while This.Periph.SERCOM_I2CM.SYNCBUSY.SYSOP or else
+            not This.Periph.SERCOM_I2CM.INTFLAG.SB loop
+         null;
+      end loop;
+      if This.Periph.SERCOM_I2CM.STATUS.RXNACK then
+         -- STOP
+         This.Periph.SERCOM_I2CM.INTFLAG.SB := True;
+         This.Periph.SERCOM_I2CM.CTRLB.ACKACT := True;
+         Data (Data'First) := This.Periph.SERCOM_I2CM.DATA;
+         while This.Periph.SERCOM_I2CM.SYNCBUSY.SYSOP loop
+            null;
+         end loop;
+         Status := Err_Error;
+         return;
+      end if;
+
+      for I in Data'Range loop
+         while This.Periph.SERCOM_I2CM.INTFLAG.SB loop
+            null;
+         end loop;
+         This.Periph.SERCOM_I2CM.INTFLAG.SB := True;
+
+         if I = Data'Last then
+            This.Periph.SERCOM_I2CM.CTRLB.ACKACT := True;
+         end if;
+         Data (I) := This.Periph.SERCOM_I2CM.DATA;
+         while This.Periph.SERCOM_I2CM.SYNCBUSY.SYSOP loop
+            null;
+         end loop;
+      end loop;
+
+      while This.Periph.SERCOM_I2CM.INTFLAG.SB loop
+         null;
+      end loop;
+
+      -- STOP
+      This.Periph.SERCOM_I2CM.INTFLAG.SB := True;
+      Status := Ok;
    end Master_Receive;
 
    overriding

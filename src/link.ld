@@ -9,7 +9,7 @@ __DYNAMIC  =  0;
 FLASH_SIZE      = 0x40000; /* 256kB, 262,144 bytes */
 BOOTLOADER_SIZE = 0x2000;  /* 8kB, 8,192 bytes */
 SRAM_SIZE       = 0x8000;  /* 32kB, 32,768 bytes */
-STACK_SIZE      = 2048;
+STACK_SIZE      = 4096;
 
 ENTRY(Reset_Handler);
 

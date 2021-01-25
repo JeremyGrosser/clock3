@@ -37,7 +37,7 @@ __vectors:
         .word __unknown_interrupt_handler /* 8 */
         .word __unknown_interrupt_handler /* 9 */
         .word __unknown_interrupt_handler /* 10 */
-        .word __unknown_interrupt_handler /* 11 */
+        .word SERCOM2_Handler             /* 11 */
         .word __unknown_interrupt_handler /* 12 */
         .word __unknown_interrupt_handler /* 13 */
         .word __unknown_interrupt_handler /* 14 */
@@ -83,6 +83,7 @@ weak_handler SysTick_Handler
 weak_handler __common_int_handler
 weak_handler WDT_Handler
 weak_handler EIC_Handler
+weak_handler SERCOM2_Handler
 
         /*********/
         /* .data */

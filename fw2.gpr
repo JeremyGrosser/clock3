@@ -19,7 +19,7 @@ project FW2 is
             "-ffunction-sections",
             "-fdata-sections",
             "-fstack-usage",
-            "-Wstack-usage=2048");
+            "-Wstack-usage=4096");
    end Compiler;
 
    package Linker is
@@ -48,7 +48,7 @@ project FW2 is
 
       --  Allocate the main stack in SRAM with 8K size
       for Main_Stack_Memory use "SRAM";
-      for Main_Stack_Size use "8K";
+      for Main_Stack_Size use "4096";
 
       --  Specification of the SRAM
       for Mem_Kind ("SRAM") use "ram";

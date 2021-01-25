@@ -1,4 +1,5 @@
-with HAL;
+with HAL; use HAL;
+with Circular_Queue;
 
 package Board is
     -- Clock is incremented by SysTick every 1ms, wraps around after 24.855 days
@@ -7,12 +8,11 @@ package Board is
     pragma Volatile (Clock);
 
     type Pins is
-       (LED_1, LED_2, MISO, MOSI, SCK, RX, TX, SCL, SDA,
+       (LED_1, LED_2, MISO, MOSI, SCK, RX, TX, SCL, SDA, USB_DP, USB_DM,
         D0, D1, D2, D3, D4, D5, D6, D7, D8, D9, D10, D11, D12, D13,
         A0, A1, A2, A3, A4, A5);
 
     type Pin_Modes is (Input, Output, Alternate);
-    type Pin_States is (Low, High);
     subtype Analog_Value is Integer range 0 .. 1000;
     type Analog_References is (Internal, External);
 
@@ -34,10 +34,10 @@ package Board is
 
     procedure Digital_Write
         (Pin   : Pins;
-         State : Pin_States);
+         State : Boolean);
     procedure Digital_Read
         (Pin   : Pins;
-         State : out Pin_States);
+         State : out Boolean);
 
     --procedure Analog_Write
     --    (Pin   : Pins;
@@ -48,10 +48,20 @@ package Board is
     --procedure Analog_Reference
     --    (Ref : Analog_References);
 
+    package Byte_Queue is new Circular_Queue
+       (Element_Type => UInt8,
+        Size         => 128);
+    use Byte_Queue;
+    Serial_Buffer : Byte_Queue.Queue;
+
+    type Serial_Status is (No_Data, Ok);
     procedure Serial_Write
-       (Data : String);
-    procedure Serial_Read
-       (Data : out String);
+       (Data : UInt8_Array);
+    function Serial_Get
+       return UInt8;
+    function Serial_Get_Line
+       (S : String := "")
+       return String;
 
     procedure SPI_Begin;
     procedure SPI_Transfer
@@ -64,7 +74,7 @@ package Board is
 
     --procedure Pulse_In
     --    (Pin     : in Pins;
-    --     State   : in Pin_States;
+    --     State   : in Boolean;
     --     Timeout : Ada.Real_Time.Time_Span := Ada.Real_Time.Milliseconds (1000));
     --
     --type Bit_Orders is (MSB_First, LSB_First);
@@ -108,4 +118,7 @@ private
     procedure EIC_Handler;
     pragma Export (C, EIC_Handler, "EIC_Handler");
     pragma Linker_Section (EIC_Handler, ".text");
+    procedure SERCOM2_Handler;
+    pragma Export (C, SERCOM2_Handler, "SERCOM2_Handler");
+    pragma Linker_Section (SERCOM2_Handler, ".text");
 end Board;

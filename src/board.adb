@@ -13,7 +13,9 @@ with SAMD21_SVD.PORT;       use SAMD21_SVD.PORT;
 with SAMD21_SVD.EIC;        use SAMD21_SVD.EIC;
 with SAMD21_SVD.ADC;        use SAMD21_SVD.ADC;
 with SAMD21_SVD.USB;        use SAMD21_SVD.USB;
+with SAMD21.Device;
 with HAL;                   use HAL;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Board is
    subtype GPIO_Pin is Natural range 0 .. 31;
@@ -28,35 +30,37 @@ package body Board is
    PB : GPIO_Port := PORTB_Periph'Access;
 
    Pin_Map : constant array (Pins) of GPIO_Point :=
-      (LED_1 => (PB, 03, A),
-       LED_2 => (PA, 27, A),
-       MISO  => (PA, 12, D), -- SERCOM4.0
-       MOSI  => (PB, 10, D), -- SERCOM4.2
-       SCK   => (PB, 11, D), -- SERCOM4.3
-       TX    => (PA, 10, D), -- SERCOM2.2
-       RX    => (PA, 11, D), -- SERCOM2.3
-       SDA   => (PA, 22, D), -- SERCOM5.0
-       SCL   => (PA, 23, D), -- SERCOM5.1
-       D0    => (PA, 11, A),
-       D1    => (PA, 10, A),
-       D2    => (PA, 14, A),
-       D3    => (PA, 09, A),
-       D4    => (PA, 08, A),
-       D5    => (PA, 15, A),
-       D6    => (PA, 20, A),
-       D7    => (PA, 21, A),
-       D8    => (PA, 06, A),
-       D9    => (PA, 07, A),
-       D10   => (PA, 18, A),
-       D11   => (PA, 16, A),
-       D12   => (PA, 19, A),
-       D13   => (PA, 17, A),
-       A0    => (PA, 02, B),
-       A1    => (PB, 08, B),
-       A2    => (PB, 09, B),
-       A3    => (PA, 04, B),
-       A4    => (PA, 05, B),
-       A5    => (PB, 02, B));
+      (LED_1  => (PB, 03, A),
+       LED_2  => (PA, 27, A),
+       MISO   => (PA, 12, D), -- SERCOM4.0
+       MOSI   => (PB, 10, D), -- SERCOM4.2
+       SCK    => (PB, 11, D), -- SERCOM4.3
+       TX     => (PA, 10, D), -- SERCOM2.2
+       RX     => (PA, 11, D), -- SERCOM2.3
+       SDA    => (PA, 22, D), -- SERCOM5.0
+       SCL    => (PA, 23, D), -- SERCOM5.1
+       USB_DM => (PA, 24, G),
+       USB_DP => (PA, 25, G),
+       D0     => (PA, 11, A),
+       D1     => (PA, 10, A),
+       D2     => (PA, 14, A),
+       D3     => (PA, 09, A),
+       D4     => (PA, 08, A), -- ESP RST
+       D5     => (PA, 15, A), -- ESP EN
+       D6     => (PA, 20, A),
+       D7     => (PA, 21, A),
+       D8     => (PA, 06, A),
+       D9     => (PA, 07, A),
+       D10    => (PA, 18, A), -- ESP GPIO_15
+       D11    => (PA, 16, A), -- ESP GPIO_2
+       D12    => (PA, 19, A), -- ESP GPIO_0
+       D13    => (PA, 17, A),
+       A0     => (PA, 02, B),
+       A1     => (PB, 08, B),
+       A2     => (PB, 09, B),
+       A3     => (PA, 04, B),
+       A4     => (PA, 05, B),
+       A5     => (PB, 02, B));
 
    Triggers : constant array (Interrupt_Triggers) of CONFIG_SENSESelect :=
       (Rising_Edge  => RISE,
@@ -64,28 +68,6 @@ package body Board is
        Both_Edges   => BOTH,
        High_Level   => HIGH,
        Low_Level    => LOW);
-
-   --  10.3.2 NVM Software Calibration Area Mapping
-   type NVM_Calibration is record
-      ADC_LINEARITY      : ADC_CALIB_LINEARITY_CAL_Field;
-      ADC_BIASCAL        : ADC_CALIB_BIAS_CAL_Field;
-      OSC32K_CAL         : SYSCTRL_OSC32K_CALIB_Field;
-      USB_TRANSN         : USB_PADCAL_USB_DEVICE_TRANSN_Field;
-      USB_TRANSP         : USB_PADCAL_USB_DEVICE_TRANSP_Field;
-      USB_TRIM           : USB_PADCAL_USB_DEVICE_TRIM_Field;
-      DFLL48M_COARSE_CAL : SYSCTRL_DFLLVAL_COARSE_Field;
-   end record;
-   for NVM_Calibration use record
-      ADC_LINEARITY      at 0 range 27 .. 34;
-      ADC_BIASCAL        at 0 range 35 .. 37;
-      OSC32K_CAL         at 0 range 38 .. 44;
-      USB_TRANSN         at 0 range 45 .. 49;
-      USB_TRANSP         at 0 range 50 .. 54;
-      USB_TRIM           at 0 range 55 .. 57;
-      DFLL48M_COARSE_CAL at 0 range 58 .. 63;
-   end record;
-   NVMCTRL_OTP4 : aliased NVM_Calibration
-      with Import, Address => System'To_Address (16#00806020#);
 
    procedure Watchdog_Enable is
    begin
@@ -144,7 +126,7 @@ package body Board is
          null;
       end loop;
 
-      Coarse := NVMCTRL_OTP4.DFLL48M_COARSE_CAL;
+      Coarse := SAMD21.Device.NVMCTRL_OTP4.DFLL48M_COARSE_CAL;
       if Coarse = 16#3f# then
          Coarse := 16#1f#;
       end if;
@@ -162,7 +144,7 @@ package body Board is
           ONDEMAND => False,
           MODE     => True,
           CCDIS    => True,
-          USBCRM   => False,
+          USBCRM   => True,
           BPLCKC   => True,
           others   => <>);
       while not SYSCTRL_Periph.PCLKSR.DFLLRDY loop
@@ -283,14 +265,19 @@ package body Board is
           others => <>);
       -- BAUD = 65536 * (1 - S * fBAUD / fREF);
       -- 63019 = 65536 * (1 - 16 * 115200 / 48_000_000)
-      SERCOM2_Periph.SERCOM_USART.BAUD := 63018;
+      SERCOM2_Periph.SERCOM_USART.BAUD := 63018; -- 115200
+      --SERCOM2_Periph.SERCOM_USART.BAUD := 65326; -- 9600
+      --SERCOM2_Periph.SERCOM_USART.BAUD := 63900; -- 74880
 
       SERCOM2_Periph.SERCOM_USART.CTRLB.RXEN := True;
       SERCOM2_Periph.SERCOM_USART.CTRLB.TXEN := True;
+      SERCOM2_Periph.SERCOM_USART.INTENSET.RXC := True;
       SERCOM2_Periph.SERCOM_USART.CTRLA.ENABLE := True;
       while SERCOM2_Periph.SERCOM_USART.SYNCBUSY.ENABLE loop
          null;
       end loop;
+
+      Serial_Buffer.Elements := (others => 0);
 
       -- SERCOM5 I2C
       GCLK_Periph.CLKCTRL :=
@@ -324,6 +311,7 @@ package body Board is
       SysTick_Periph.CSR.ENABLE := Enable;
 
       NVIC_Periph.NVIC_ISER := Shift_Left (1, EIC_Interrupt);
+      NVIC_Periph.NVIC_ISER := Shift_Left (1, SERCOM2_Interrupt);
       NVIC_Periph.NVIC_ISER := Shift_Left (1, 15); -- SysTick
    end Initialize;
 
@@ -353,12 +341,12 @@ package body Board is
 
    procedure Digital_Write
       (Pin   : Pins;
-       State : Pin_States)
+       State : Boolean)
    is
       Point : constant GPIO_Point := Pin_Map (Pin);
       Mask  : constant UInt32 := Shift_Left (1, Point.Num);
    begin
-      if State = High then
+      if State then
          Point.Port.OUTSET := Mask;
       else
          Point.Port.OUTCLR := Mask;
@@ -367,14 +355,14 @@ package body Board is
 
    procedure Digital_Read
       (Pin   : Pins;
-       State : out Pin_States)
+       State : out Boolean)
    is
       Point : constant GPIO_Point := Pin_Map (Pin);
    begin
       if (Shift_Right (Point.Port.DIN, Point.Num) and 1) = 1 then
-         State := High;
+         State := True;
       else
-         State := Low;
+         State := False;
       end if;
    end Digital_Read;
 
@@ -391,12 +379,12 @@ package body Board is
       SERCOM4_Periph.SERCOM_SPI.DATA.DATA := UInt9 (Data);
 
       while not SERCOM4_Periph.SERCOM_SPI.INTFLAG.RXC loop
-         null;
+         Wait_For_Interrupt;
       end loop;
       Data := UInt8 (SERCOM4_Periph.SERCOM_SPI.DATA.DATA);
 
       while not SERCOM4_Periph.SERCOM_SPI.INTFLAG.DRE loop
-         null;
+         Wait_For_Interrupt;
       end loop;
    end SPI_Transfer;
 
@@ -423,23 +411,47 @@ package body Board is
    end Unique_Id;
 
    procedure Serial_Write
-      (Data : String)
+      (Data : UInt8_Array)
    is
    begin
-      for Ch of Data loop
+      for D of Data loop
          while not SERCOM2_Periph.SERCOM_USART.INTFLAG.DRE loop
-            null;
+            Wait_For_Interrupt;
          end loop;
-         SERCOM2_Periph.SERCOM_USART.DATA.DATA := UInt9 (Character'Pos (Ch));
+         SERCOM2_Periph.SERCOM_USART.DATA.DATA := UInt9 (D);
+      end loop;
+      while not SERCOM2_Periph.SERCOM_USART.INTFLAG.TXC loop
+         Wait_For_Interrupt;
       end loop;
    end Serial_Write;
 
-   procedure Serial_Read
-      (Data : out String)
+   function Serial_Get
+      return UInt8
    is
+      D : UInt8;
    begin
-      Data := "";
-   end Serial_Read;
+      loop
+         if not Empty (Serial_Buffer) then
+            D := Consume (Serial_Buffer).all;
+            Put (Character'Val (Natural (D)));
+            return D;
+         else
+            Wait_For_Interrupt;
+         end if;
+      end loop;
+   end Serial_Get;
+
+   function Serial_Get_Line (S : String := "")
+      return String
+   is
+      Ch : Character := Character'Val (Natural (Serial_Get));
+   begin
+      if Ch = ASCII.LF then
+         return S & Ch;
+      else
+         return Serial_Get_Line (S & Ch);
+      end if;
+   end Serial_Get_Line;
 
    procedure Wait_For_Interrupt is
    begin
@@ -500,4 +512,11 @@ package body Board is
          end if;
       end loop;
    end EIC_Handler;
+
+   procedure SERCOM2_Handler is
+   begin
+      while SERCOM2_Periph.SERCOM_USART.INTFLAG.RXC loop
+         Add (Serial_Buffer, UInt8 (SERCOM2_Periph.SERCOM_USART.DATA.DATA));
+      end loop;
+   end SERCOM2_Handler;
 end Board;
