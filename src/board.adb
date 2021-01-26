@@ -13,9 +13,9 @@ with SAMD21_SVD.PORT;       use SAMD21_SVD.PORT;
 with SAMD21_SVD.EIC;        use SAMD21_SVD.EIC;
 with SAMD21_SVD.ADC;        use SAMD21_SVD.ADC;
 with SAMD21_SVD.USB;        use SAMD21_SVD.USB;
+with SAMD21_SVD.RTC;        use SAMD21_SVD.RTC;
 with SAMD21.Device;
 with HAL;                   use HAL;
-with Ada.Text_IO; use Ada.Text_IO;
 
 package body Board is
    subtype GPIO_Pin is Natural range 0 .. 31;
@@ -89,6 +89,24 @@ package body Board is
    begin
       WDT_Periph.CLEAR := 16#A5#;
    end Watchdog_Reload;
+
+   procedure Enable_Interrupt
+      (IRQn : Interrupt_Number)
+   is
+   begin
+      NVIC_Periph.NVIC_ISER := Shift_Left (1, IRQn);
+      System.Machine_Code.Asm ("dsb", Volatile => True);
+      System.Machine_Code.Asm ("isb", Volatile => True);
+   end Enable_Interrupt;
+
+   procedure Disable_Interrupt
+      (IRQn : Interrupt_Number)
+   is
+   begin
+      NVIC_Periph.NVIC_ICER := Shift_Left (1, IRQn);
+      System.Machine_Code.Asm ("dsb", Volatile => True);
+      System.Machine_Code.Asm ("isb", Volatile => True);
+   end Disable_Interrupt;
 
    procedure Initialize is
       Coarse : SYSCTRL_DFLLVAL_COARSE_Field;
@@ -271,7 +289,9 @@ package body Board is
 
       SERCOM2_Periph.SERCOM_USART.CTRLB.RXEN := True;
       SERCOM2_Periph.SERCOM_USART.CTRLB.TXEN := True;
-      SERCOM2_Periph.SERCOM_USART.INTENSET.RXC := True;
+      SERCOM2_Periph.SERCOM_USART.INTENSET :=
+         (RXC    => True,
+          others => <>);
       SERCOM2_Periph.SERCOM_USART.CTRLA.ENABLE := True;
       while SERCOM2_Periph.SERCOM_USART.SYNCBUSY.ENABLE loop
          null;
@@ -305,13 +325,71 @@ package body Board is
          null;
       end loop;
 
+      -- RTC
+      SYSCTRL_Periph.OSC32K :=
+         (ENABLE   => True,
+          CALIB    => SAMD21.Device.NVMCTRL_OTP4.OSC32K_CAL,
+          STARTUP  => 7,
+          EN32K    => True,
+          ONDEMAND => False,
+          others   => <>);
+      while not SYSCTRL_Periph.PCLKSR.OSC32KRDY loop
+         null;
+      end loop;
+
+      GCLK_Periph.GENDIV :=
+         (ID     => 3,
+          DIV    => 32,
+          others => <>);
+      while GCLK_Periph.STATUS.SYNCBUSY loop
+         null;
+      end loop;
+
+      GCLK_Periph.GENCTRL :=
+         (ID     => 3,
+          SRC    => OSC32K,
+          GENEN  => True,
+          others => <>);
+      while GCLK_Periph.STATUS.SYNCBUSY loop
+         null;
+      end loop;
+
+      GCLK_Periph.CLKCTRL :=
+         (ID     => RTC,
+          GEN    => GCLK3,
+          CLKEN  => True,
+          others => <>);
+      while GCLK_Periph.STATUS.SYNCBUSY loop
+         null;
+      end loop;
+
+      PM_Periph.APBAMASK.RTC := True;
+      --RTC_Periph.RTC_MODE2.CTRL.SWRST := True;
+      --while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+      --   null;
+      --end loop;
+      RTC_Periph.RTC_MODE2.CTRL :=
+         (MODE      => SAMD21_SVD.RTC.CLOCK,
+          CLKREP    => False,
+          ENABLE    => True,
+          PRESCALER => DIV1024,
+          others => <>);
+      RTC_Periph.RTC_MODE2.MASK.SEL := SS;
+      RTC_Periph.RTC_MODE2.ALARM.SECOND := 0;
+      --RTC_Periph.RTC_MODE2.INTENSET :=
+      --   (ALARM0 => True,
+      --    others => <>);
+      while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+         null;
+      end loop;
+
       SysTick_Periph.CSR.CLKSOURCE := CPU_Clk;
       SysTick_Periph.RVR.RELOAD := SYST_RVR_RELOAD_Field (System_Clock_Frequency / 1000); -- Reload every 1ms
       SysTick_Periph.CSR.TICKINT := Enable;
       SysTick_Periph.CSR.ENABLE := Enable;
 
-      NVIC_Periph.NVIC_ISER := Shift_Left (1, EIC_Interrupt);
-      NVIC_Periph.NVIC_ISER := Shift_Left (1, SERCOM2_Interrupt);
+      --Enable_Interrupt (RTC_Interrupt);
+      Enable_Interrupt (SERCOM2_Interrupt);
       NVIC_Periph.NVIC_ISER := Shift_Left (1, 15); -- SysTick
    end Initialize;
 
@@ -416,12 +494,12 @@ package body Board is
    begin
       for D of Data loop
          while not SERCOM2_Periph.SERCOM_USART.INTFLAG.DRE loop
-            Wait_For_Interrupt;
+            null;
          end loop;
          SERCOM2_Periph.SERCOM_USART.DATA.DATA := UInt9 (D);
-      end loop;
-      while not SERCOM2_Periph.SERCOM_USART.INTFLAG.TXC loop
-         Wait_For_Interrupt;
+         while not SERCOM2_Periph.SERCOM_USART.INTFLAG.TXC loop
+            null;
+         end loop;
       end loop;
    end Serial_Write;
 
@@ -432,12 +510,13 @@ package body Board is
    begin
       loop
          if not Empty (Serial_Buffer) then
+            Disable_Interrupt (SERCOM2_Interrupt);
             D := Consume (Serial_Buffer).all;
-            Put (Character'Val (Natural (D)));
+            Enable_Interrupt (SERCOM2_Interrupt);
+            --Put (Character'Val (Natural (D)));
             return D;
-         else
-            Wait_For_Interrupt;
          end if;
+         Wait_For_Interrupt;
       end loop;
    end Serial_Get;
 
@@ -461,6 +540,9 @@ package body Board is
    procedure Wait (Milliseconds : Time) is
       T : Time with Volatile => True;
    begin
+      if Clock > Time'Last - Milliseconds then
+         return;
+      end if;
       T := Clock + Milliseconds;
       while Clock < T loop
          Wait_For_Interrupt;
@@ -468,7 +550,7 @@ package body Board is
    end Wait;
 
    procedure Attach_Interrupt
-       (Interrupt : Interrupt_Numbers;
+       (Interrupt : External_Interrupt_Numbers;
         Handler   : Interrupt_Procedure;
         Trigger   : Interrupt_Triggers)
    is
@@ -477,16 +559,42 @@ package body Board is
       --EIC_Periph.EVCTRL.EXTINTEO.Arr (Interrupt) := True;
       EIC_Periph.CONFIG (Interrupt / 8).SENSE (Interrupt mod 8).SENSE := Triggers (Trigger);
       EIC_Periph.INTENSET.EXTINT.Arr (Interrupt) := True;
+      Enable_Interrupt (EIC_Interrupt);
    end Attach_Interrupt;
 
 	procedure Detach_Interrupt
-       (Interrupt : Interrupt_Numbers)
+       (Interrupt : External_Interrupt_Numbers)
    is
    begin
       --EIC_Periph.EVCTRL.EXTINTEO.Arr (Interrupt) := False;
       EIC_Periph.INTENSET.EXTINT.Arr (Interrupt) := False;
       Interrupt_Handlers (Interrupt) := null;
    end Detach_Interrupt;
+
+   procedure Set_RTC
+      (Hour, Minute, Second : Natural)
+   is
+   begin
+      RTC_Periph.RTC_MODE2.CLOCK.Hour := RTC_CLOCK_RTC_MODE2_HOUR_Field (Hour);
+      RTC_Periph.RTC_MODE2.CLOCK.Minute := RTC_CLOCK_RTC_MODE2_MINUTE_Field (Minute);
+      RTC_Periph.RTC_MODE2.CLOCK.Second := RTC_CLOCK_RTC_MODE2_SECOND_Field (Second);
+      while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+         null;
+      end loop;
+   end Set_RTC;
+
+   procedure Get_RTC
+      (Hour, Minute, Second : out Natural)
+   is
+   begin
+      RTC_Periph.RTC_MODE2.READREQ.RREQ := True;
+      while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+         null;
+      end loop;
+      Hour   := Natural (RTC_Periph.RTC_MODE2.CLOCK.HOUR);
+      Minute := Natural (RTC_Periph.RTC_MODE2.CLOCK.MINUTE);
+      Second := Natural (RTC_Periph.RTC_MODE2.CLOCK.SECOND);
+   end Get_RTC;
 
    procedure SysTick_Handler is
    begin
@@ -503,7 +611,7 @@ package body Board is
 
    procedure EIC_Handler is
    begin
-      for Interrupt in Interrupt_Numbers'Range loop
+      for Interrupt in External_Interrupt_Numbers'Range loop
          if EIC_Periph.INTFLAG.EXTINT.Arr (Interrupt) then
             EIC_Periph.INTFLAG.EXTINT.Arr (Interrupt) := True;
             if Interrupt_Handlers (Interrupt) /= null then
@@ -516,7 +624,18 @@ package body Board is
    procedure SERCOM2_Handler is
    begin
       while SERCOM2_Periph.SERCOM_USART.INTFLAG.RXC loop
+         Disable_Interrupt (SERCOM2_Interrupt);
          Add (Serial_Buffer, UInt8 (SERCOM2_Periph.SERCOM_USART.DATA.DATA));
+         Enable_Interrupt (SERCOM2_Interrupt);
       end loop;
    end SERCOM2_Handler;
+
+   procedure RTC_Handler is
+   begin
+      RTC_Periph.RTC_MODE2.INTFLAG :=
+         (OVF     => True,
+          SYNCRDY => True,
+          ALARM0  => True,
+          others  => <>);
+   end RTC_Handler;
 end Board;

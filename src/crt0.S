@@ -29,7 +29,7 @@ __vectors:
         .word __unknown_interrupt_handler /* 0 */
         .word __unknown_interrupt_handler /* 1 */
         .word WDT_Handler                 /* 2 */
-        .word __unknown_interrupt_handler /* 3 */
+        .word RTC_Handler                 /* 3 */
         .word EIC_Handler                 /* 4 */
         .word __unknown_interrupt_handler /* 5 */
         .word __unknown_interrupt_handler /* 6 */
@@ -84,6 +84,7 @@ weak_handler __common_int_handler
 weak_handler WDT_Handler
 weak_handler EIC_Handler
 weak_handler SERCOM2_Handler
+weak_handler RTC_Handler
 
         /*********/
         /* .data */

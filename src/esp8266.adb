@@ -1,7 +1,7 @@
+with SAMD21_SVD.Interrupts; use SAMD21_SVD.Interrupts;
 with Board; use Board;
 with HAL; use HAL;
-with Ada.Text_IO; use Ada.Text_IO;
-with Hex; use Hex;
+with Str; use Str;
 
 package body ESP8266 is
    ESP_RST     : Pins := D4;
@@ -44,26 +44,15 @@ package body ESP8266 is
    begin
       Digital_Write (ESP_EN, True);
       Reset;
+      Byte_Queue.Clear (Serial_Buffer);
+      Enable_Interrupt (SERCOM2_Interrupt);
    end Enable;
 
    procedure Disable is
    begin
       Digital_Write (ESP_EN, False);
+      Disable_Interrupt (SERCOM2_Interrupt);
    end Disable;
-
-   procedure Wait_Ok
-   is
-      CH1, CH2 : UInt8 := 0;
-   begin
-      loop
-         CH2 := Serial_Get;
-         if CH1 = 79 and CH2 = 75 then
-            return;
-         else
-            CH1 := CH2;
-         end if;
-      end loop;
-   end Wait_Ok;
 
    function To_String
       (U : UInt8_Array)
@@ -92,7 +81,6 @@ package body ESP8266 is
    end To_Array;
 
    procedure Initialize is
-      use ASCII;
    begin
       Pin_Mode (ESP_EN, Output);
       Disable;
@@ -101,8 +89,10 @@ package body ESP8266 is
       Pin_Mode (ESP_GPIO_2, Output);
       Pin_Mode (ESP_GPIO_0, Output);
       Set_Boot_Mode (Normal);
-      Enable;
+      --Set_Boot_Mode (Program);
+      --Enable;
    end Initialize;
+
 
    procedure Get_Time (Hour, Minute, Second : out Natural)
    is
@@ -116,20 +106,37 @@ package body ESP8266 is
       CRLF : constant String := ASCII.CR & ASCII.LF;
    begin
       Board.Byte_Queue.Clear (Serial_Buffer);
+      Wait (1000);
       Serial_Write (To_Array ("wifi.setmode(wifi.STATION)" & CRLF));
-      Wait_For ('>');
+      Wait (20);
+      Serial_Write (To_Array ("function on_time(sec,usec,server,info) " & CRLF & "tm = rtctime.epoch2cal(sec)" & CRLF & "print(string.format(""!TIME=%04d-%02d-%02dT%02d:%02d:%02d"", tm[""year""], tm[""mon""], tm[""day""], tm[""hour""], tm[""min""], tm[""sec""]))" & CRLF & "end" & CRLF));
+      Wait (20);
+      Serial_Write (To_Array ("wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function() sntp.sync(nil, on_time) end)" & CRLF));
+      Wait (20);
+      Serial_Write (To_Array ("wifi.eventmon.register(wifi.eventmon.STA_CONNECTED, function() print(""!CONNECTED"") end)" & CRLF));
+      Wait (20);
       Serial_Write (To_Array ("wifi.sta.config({ssid=""sierra24"",pwd=""whatevenisapassword""})" & CRLF));
-      Wait_For ('>');
-      Wait (5000);
-      Serial_Write (To_Array ("sntp.sync()" & CRLF));
-      Wait_For ('>');
-      Wait (5000);
-      Serial_Write (To_Array ("rtctime.get()" & CRLF));
-      Wait_For (ASCII.LF);
-      Wait_For (ASCII.LF);
+      Wait (20);
+      Board.Byte_Queue.Clear (Serial_Buffer);
 
-      Hour := 0;
-      Minute := 0;
-      Second := 0;
+      loop
+         Wait_For ('!');
+         declare
+            Line : String := Serial_Get_Line;
+         begin
+            if Starts_With (Line, "TIME=") then
+               declare
+                  Hour_Str   : String := Line (Find (Line (Line'First + 1 .. Line'Last), 'T') + 1 .. Find (Line, ':') - 1);
+                  Minute_Str : String := Line (Hour_Str'Last + 2 .. Hour_Str'Last + 3);
+                  Second_Str : String := Line (Minute_Str'Last + 2 .. Minute_Str'Last + 3);
+               begin
+                  Hour   := To_Natural (Hour_Str);
+                  Minute := To_Natural (Minute_Str);
+                  Second := To_Natural (Second_Str);
+                  return;
+               end;
+            end if;
+         end;
+      end loop;
    end Get_Time;
 end ESP8266;

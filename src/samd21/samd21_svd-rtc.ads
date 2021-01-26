@@ -913,6 +913,7 @@ package SAMD21_SVD.RTC is
 
    subtype RTC_CLOCK_RTC_MODE2_SECOND_Field is HAL.UInt6;
    subtype RTC_CLOCK_RTC_MODE2_MINUTE_Field is HAL.UInt6;
+   subtype RTC_CLOCK_RTC_MODE2_HOUR_Field is HAL.UInt5;
 
    --  Hour
    type CLOCK_HOURSelect is
@@ -936,7 +937,8 @@ package SAMD21_SVD.RTC is
       --  Minute
       MINUTE : RTC_CLOCK_RTC_MODE2_MINUTE_Field := 16#0#;
       --  Hour
-      HOUR   : CLOCK_HOURSelect := SAMD21_SVD.RTC.AM;
+      --HOUR   : CLOCK_HOURSelect := SAMD21_SVD.RTC.AM;
+      HOUR   : RTC_CLOCK_RTC_MODE2_HOUR_Field := 16#0#;
       --  Day
       DAY    : RTC_CLOCK_RTC_MODE2_DAY_Field := 16#0#;
       --  Month

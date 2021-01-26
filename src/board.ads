@@ -50,7 +50,7 @@ package Board is
 
     package Byte_Queue is new Circular_Queue
        (Element_Type => UInt8,
-        Size         => 128);
+        Size         => 512);
     use Byte_Queue;
     Serial_Buffer : Byte_Queue.Queue;
 
@@ -91,23 +91,33 @@ package Board is
     --
     procedure Wait_For_Interrupt;
 
-    subtype Interrupt_Numbers is Integer range 0 .. 15;
+    subtype External_Interrupt_Numbers is Integer range 0 .. 15;
     type Interrupt_Procedure is access procedure;
     type Interrupt_Triggers is (Rising_Edge, Falling_Edge, Both_Edges, High_Level, Low_Level);
     procedure Attach_Interrupt
-        (Interrupt : Interrupt_Numbers;
+        (Interrupt : External_Interrupt_Numbers;
          Handler   : Interrupt_Procedure;
          Trigger   : Interrupt_Triggers);
     procedure Detach_Interrupt
-        (Interrupt : Interrupt_Numbers);
+        (Interrupt : External_Interrupt_Numbers);
 
-private
+    procedure Set_RTC (Hour, Minute, Second : Natural);
+    procedure Get_RTC (Hour, Minute, Second : out Natural);
+
+    subtype Interrupt_Number is Natural range 0 .. 27;
+    procedure Enable_Interrupt
+       (IRQn : Interrupt_Number);
+    procedure Disable_Interrupt
+       (IRQn : Interrupt_Number);
+
+ private
 
     subtype Hertz is Natural;
     System_Clock_Frequency : Hertz := 1_000_000;
     pragma Volatile (System_Clock_Frequency);
 
-    Interrupt_Handlers : array (Interrupt_Numbers) of Interrupt_Procedure := (others => null);
+    Interrupt_Handlers : array (External_Interrupt_Numbers) of Interrupt_Procedure := (others => null);
+
 
     procedure SysTick_Handler;
     pragma Export (C, SysTick_Handler, "SysTick_Handler");
@@ -121,4 +131,7 @@ private
     procedure SERCOM2_Handler;
     pragma Export (C, SERCOM2_Handler, "SERCOM2_Handler");
     pragma Linker_Section (SERCOM2_Handler, ".text");
+    procedure RTC_Handler;
+    pragma Export (C, RTC_Handler, "RTC_Handler");
+    pragma Linker_Section (RTC_Handler, ".text");
 end Board;

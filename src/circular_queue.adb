@@ -23,34 +23,32 @@ package body Circular_Queue is
       (This : in out Queue;
        Item : Element_Type)
    is
-      Tail : Index_Type := This.Tail;
-      Used : Natural := This.Used + 1;
+      Extra : access Element_Type;
    begin
-      if Tail = Index_Type'Last then
-         Tail := Index_Type'First;
-      else
-         Tail := Tail + 1;
+      if This.Used = Size then
+         Extra := Consume (This);
       end if;
-      This.Tail := Tail;
+      if This.Tail = Index_Type'Last then
+         This.Tail := Index_Type'First;
+      else
+         This.Tail := This.Tail + 1;
+      end if;
       This.Elements (This.Tail) := Item;
-      This.Used := Used;
+      This.Used := This.Used + 1;
    end Add;
 
    function Consume
       (This : in out Queue)
       return access Element_Type
    is
-      Head : Index_Type := This.Head;
-      Used : Natural := This.Used - 1;
-      Item : access Element_Type := This.Elements (Head)'Access;
+      Item : access Element_Type := This.Elements (This.Head)'Access;
    begin
-      if Head >= Index_Type'Last then
-         Head := Index_Type'First;
+      if This.Head >= Index_Type'Last then
+         This.Head := Index_Type'First;
       else
-         Head := Head + 1;
+         This.Head := This.Head + 1;
       end if;
-      This.Head := Head;
-      This.Used := Used;
+      This.Used := This.Used - 1;
       return Item;
    end Consume;
 
