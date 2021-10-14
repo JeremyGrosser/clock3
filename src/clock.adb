@@ -33,9 +33,9 @@ package body Clock is
       Display_2.Initialize;
       Display_3.Initialize;
 
-      Display_1.Set_Brightness (HT16K33.Brightness_Level'Last);
-      Display_2.Set_Brightness (HT16K33.Brightness_Level'Last);
-      Display_3.Set_Brightness (HT16K33.Brightness_Level'Last);
+      Display_1.Set_Brightness (HT16K33.Brightness_Level'First);
+      Display_2.Set_Brightness (HT16K33.Brightness_Level'First);
+      Display_3.Set_Brightness (HT16K33.Brightness_Level'First);
 
       ESP8266.Initialize;
       ESP8266.Enable;

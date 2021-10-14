@@ -110,6 +110,8 @@ package Board is
     procedure Disable_Interrupt
        (IRQn : Interrupt_Number);
 
+    procedure Enable_PPS;
+
  private
 
     subtype Hertz is Natural;

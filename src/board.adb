@@ -47,7 +47,7 @@ package body Board is
        D3     => (PA, 09, A),
        D4     => (PA, 08, A), -- ESP RST
        D5     => (PA, 15, A), -- ESP EN
-       D6     => (PA, 20, A),
+       D6     => (PA, 20, A), -- PPS
        D7     => (PA, 21, A),
        D8     => (PA, 06, A),
        D9     => (PA, 07, A),
@@ -374,7 +374,13 @@ package body Board is
           ENABLE    => True,
           PRESCALER => DIV1024,
           others => <>);
+      while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+         null;
+      end loop;
       RTC_Periph.RTC_MODE2.MASK.SEL := SS;
+      while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+         null;
+      end loop;
       RTC_Periph.RTC_MODE2.ALARM.SECOND := 0;
       --RTC_Periph.RTC_MODE2.INTENSET :=
       --   (ALARM0 => True,
@@ -391,6 +397,8 @@ package body Board is
       --Enable_Interrupt (RTC_Interrupt);
       Enable_Interrupt (SERCOM2_Interrupt);
       NVIC_Periph.NVIC_ISER := Shift_Left (1, 15); -- SysTick
+
+      Enable_PPS;
    end Initialize;
 
    procedure Pin_Mode
@@ -549,6 +557,13 @@ package body Board is
       end loop;
    end Wait;
 
+   procedure Enable_PPS is
+   begin
+      Pin_Mode (D6, Alternate);
+      EIC_Periph.EVCTRL.EXTINTEO.Arr (4) := True;
+      EIC_Periph.CONFIG (0).SENSE (4).SENSE := Triggers (Rising_Edge);
+   end Enable_PPS;
+
    procedure Attach_Interrupt
        (Interrupt : External_Interrupt_Numbers;
         Handler   : Interrupt_Procedure;
@@ -587,13 +602,25 @@ package body Board is
       (Hour, Minute, Second : out Natural)
    is
    begin
+      while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+         null;
+      end loop;
       RTC_Periph.RTC_MODE2.READREQ.RREQ := True;
       while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
          null;
       end loop;
       Hour   := Natural (RTC_Periph.RTC_MODE2.CLOCK.HOUR);
+      while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+         null;
+      end loop;
       Minute := Natural (RTC_Periph.RTC_MODE2.CLOCK.MINUTE);
+      while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+         null;
+      end loop;
       Second := Natural (RTC_Periph.RTC_MODE2.CLOCK.SECOND);
+      while RTC_Periph.RTC_MODE2.STATUS.SYNCBUSY loop
+         null;
+      end loop;
    end Get_RTC;
 
    procedure SysTick_Handler is
